@@ -1,0 +1,55 @@
+\input{Setup/Latex_includes/preamble.tex}% package inclusion and set up of the document
+\input{Setup/Latex_includes/Macro.tex}
+
+\begin{document}
+\pagestyle{empty} %disable headers and footers
+\pagenumbering{roman} %use roman page numbering in the frontmatter
+
+%%%%%%%%%%%%%%%%
+%Front stuff
+%%%%%%%%%%%%%%%%
+\input{Setup/Opsaetning/frontpage.tex}
+\input{Setup/Opsaetning/colophon.tex}
+\input{Setup/Opsaetning/titlepages.tex}
+\input{Setup/Opsaetning/Forord.tex}
+%\input{Setup/Opsaetning/Resume.tex}
+
+\cleardoublepage
+\pdfbookmark[1]{Contents}{label:contents}
+\pagestyle{fancy} %enable headers and footers again
+\setcounter{tocdepth}{1}
+\tableofcontents
+\cleardoublepage
+
+
+\input{Sections/Chapters/Preliminaries/Introduction.tex}
+
+%%%%%%%%%%%%%%%%%%
+% main-matter begin
+%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic} %use Arabic page numbering in the main-matter
+%%%%%%%%%%%%%%%%%%
+% Chapters and Bibliography
+%%%%%%%%%%%%%%%%%%
+
+\part{Preliminaries}
+\input{Sections/Chapters/Preliminaries/Preliminaries.tex}
+\part{Requirements \& Design}
+\input{Sections/Chapters/Design/Design.tex}
+\part{Implementation}
+\input{Sections/Chapters/Implementation/Implementation.tex}
+\part{Reflections}
+\input{Sections/Chapters/Reflection/Reflection.tex}
+
+%%%%%%%%%%%%%%%%%%%
+%Include Bibtex
+%%%%%%%%%%%%%%%%%%
+\printbibliography[heading=bibintoc]
+\label{bib:mybiblio}
+
+\appendix
+\addcontentsline{toc}{chapter}{Appendix}
+\input{Sections/Bilag/bilag.tex}
+\label{lastpage}
+
+\end{document}

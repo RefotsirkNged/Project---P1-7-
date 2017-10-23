@@ -1,0 +1,103 @@
+To better define the architecture of the system, we have chosen to define the class diagrams using UML diagrams. Before presenting the different class diagrams, it is important to have a better understanding of the different components that makes up the system. 
+
+After the components has been defined, the non-functional requirements has been valuated for each. This has been done using different system quality criteria.
+
+Finally a class diagram for each component has been designed and described.
+
+\section{Components}
+Based on the arguments of section \ref{chap:technologies}, the program has been split into different component, which has different responsibilities. Since the solution should implement different technologies all running on different platforms, it was decided to connect it all through a Web-API. This would make it possible to easily connect new components to the solution which expand on the functionality of the solution. In this section the different components, including the Web-API, have been described and in the end defined with use of class diagrams
+
+\subsection{Smartphone app}
+We have chosen to use the smartphone as the detection mechanism since that we concluded in \todo{Insert ref} that most people have a smartphone and have it on them most of the time. 
+
+The smartphone app has in it self has two components, one for the citizen, that detects fall accidents and reports them to the Web-API, and one that the next of kin or other relevant personal has, that activates when the Web-API sends out a warning.
+
+The smartphone app, will be able to communicate with the Web-API. It 
+
+This smartphone app should be able to talk to the Web-API to make a more all encompassing experience, this will be done by sharing the state information with the Web-API from the smart-phone so when we detect a fall this should start and alarm that should verify that it is a real fall and that the person need help, after this it should ping the server if 
+
+\subsection{Personal assistant}
+The personal assistant will allow the citizen to call for help, by using single or a few keywords. These words should be clear and logical for the user, but not allow for a false positive. When it is confident that the citizen has had a falling accident, it notifies the server over the Web-API. When the request has been acknowledged, the personal assistant say so, and can also say what contact has answered the call.
+
+\subsection{Web-API}
+The systems Web-API allows for extending the capabilities of the system, by connecting IoT devices. The IoT devices can enhance the system in several ways depending on the added devices, but they focus on helping the citizen with their needs, mainly focusing on reminding them of things they need to do and call for help if needed. 
+
+The devices will use the Web-API to make a request with information it has collected to notify the web-server that something has happened, where it will answer with a response as to what the device now must do if anything. The devices can also receive calls from the web-server to trigger the device.
+
+
+\subsection{Control panel}
+The control panel will allow control over the citizens and devices. The control panel is connected with the Web-API, and runs through a web interface. 
+
+
+\section{Non-functional requirements}
+The criteria of the system has been defined using non-functional requirements for each component. These work as guidelines during the design of the system architecture. The different criteria that is used is from the book \textit{Objekt orienteret analyse \& design} \cite{subook}.
+
+The criteria for each component are as seen on figure \ref{tab:non-functional}.
+
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+              & \multicolumn{1}{l|}{Smartphone app} & \multicolumn{1}{l|}{Personal assistant} & \multicolumn{1}{l|}{Web-API} & \multicolumn{1}{l|}{Control panel} \\ \hline
+Usable        &                                     &                                  &                              & x                                  \\ \hline
+Secure        &                                     &                                  & x                            & x                                  \\ \hline
+Efficient     & x                                   & x                                & x                            &                                    \\ \hline
+Correct       & x                                   & x                                & x                            & x                                  \\ \hline
+Reliable      & x                                   & x                                & x                            &                                    \\ \hline
+Maintainable  &                                     &                                  & x                            &                                    \\ \hline
+Testable      & x                                   & x                                & x                            &                                    \\ \hline
+Flexible      &                                     &                                  & x                            &                                    \\ \hline
+Comprehensive &                                     &                                  &                              &                                    \\ \hline
+Reuseable     &                                     &                                  &                              &                                    \\ \hline
+Portable      & x                                   &                                  &                              &                                    \\ \hline
+Interoperable &                                     &                                  & x                            &                                    \\ \hline
+\end{tabular}
+\caption{Non-functional requirements}
+\label{tab:non-functional}
+\end{table}
+
+\paragraph{Usable}
+The usability is important for the control panel, as it needs to conform to the organizational environment of the system.
+This could for example be organizational requirements for data visibility.
+
+\paragraph{Secure}
+It is important for the web Web-API and control panel to be secure as they may allow access to personal information for the citizens.
+Since the smartphone app and the personal assistant would not have access to that data anyway there is no need to think about making them more secure than they are by the manufacturer.
+
+\paragraph{Efficient}
+The efficiency of the smartphone, the personal assistant and the Web-API is important for different reasons.
+The efficiency of the smartphone is important due to concerns about not draining the battery too fast. The app would be constantly running, either in the background or normally, and could therefore easily be a drain on the battery-life if not implemented in an efficient manner.
+The efficiency of the personal assistant is important due to the costs associated with running for example an Personal assistant skill on an AWS Lambda service. So in order to minimize the costs, it should limit the amount of usage of the service, if possible.
+The efficiency of the Web-API is important due to the possibly large amount of requests being made at any given time. If the system ends up having a lot of users, this would be important.
+
+\paragraph{Correct}
+Every part of the system needs to fulfill the specified requirements.
+
+\paragraph{Reliable}
+The smartphone app needs to be able to perform its fall-detection precisely enough that it does not create false positives.
+The personal-assistant needs to be able to perform its voice recognition precisely enough that it does not create false positives. In this case this would mean being able to detect a cry for help well enough that it does not detect a normal conversation as one.
+The Web-API needs to be precise enough that it does not corrupt data. This could for example be
+that it does not give out the wrong data when a request is made for user-data, or send out wrong notifications regarding falling accidents.
+
+\paragraph{Maintainable}
+The Web-API needs to be maintainable enough that it is possible to add future IoT devices to it without it requiring a rewrite of the Web-API every time an addition or removal of an IoT device is needed.
+
+\paragraph{Testable}
+It is important that the smartphone app, personal assistant and Web-API is thoroughly tested, because if the components malfunction when they are needed, the citizen in need of help will not get it.
+
+\paragraph{Flexible}
+The Web-API needs to be flexible enough that it is possible, and economically feasible to change parts of the Web-API after it has been taken into use.
+
+\paragraph{Comprehensive}
+No part of the system absolutely needs to be comprehensive, as long as the system is usable by the user.
+
+\paragraph{Reuseable}
+There will be no focus on making any of the components in the system reusable.
+
+\paragraph{Portable}
+The smartphone app will need to be written in a way that makes it portable, since it will need to work on the smartphone that the citizen has. 
+
+\paragraph{Interoperable}
+The Web-API needs to be able to integrate with new IoT devices without it being too big of a cost. This enables possible future extension of the system, with various new IoT devices.

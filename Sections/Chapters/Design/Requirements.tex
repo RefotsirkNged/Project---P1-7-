@@ -1,0 +1,49 @@
+In this chapter, the requirements of a system that can solve the problem described in the problem definition \ref{problemdefinition} has been defined. This has been done by first describing different use cases for the system and then analyzing them to get a formal list of requirements.
+
+\section{System behaviour}
+To better understand how the system of this report could work, this section contains a more in-depth description of an actual situation we imagine the system being used in. This includes descriptions of how each part of the system should respond to an event.
+
+The system should be activated upon one of the following conditions, that triggers during or after the falling accident has happened:
+
+\begin{itemize}
+    \item The smartphone detects a falling event
+    \item The personal assistant detects a falling event
+    \item The system detects a falling event
+\end{itemize}
+
+When the smartphone detects a falling event, it should wait a short while for user response, either in the form of a button-press or voice-detection. This would allow for the user to interrupt the process, and therefore avoid emergency services being contacted when they are not needed. When a short while has passed, and no user interaction has happened, it should proceed with contacting emergency services, and whoever is listed as next of kin (if any).
+Furthermore it should try and distinguish between false positives when detecting events. 
+
+When the personal assistant detects a falling event it should verify that a falling incident has actually taken place, and then it notifies the system that the citizen has fallen and calls for help. The personal assistant receives confirmation that help has been requested and who have responded to it. The personal assistant should be context aware, so that it doesn't call for help during normal dialogue, and in general try to distinguish between false positives.
+
+When the system detects a falling event it looks up the citizen in need of help, and find their contact list. It then tries to contact people on the contact list until someone on the list responds to the call for help. It should also be an option to call emergency services, if nobody on the contact list responds.
+
+A \guardian receives a notification when the \guardian is the next person on the contact list. If the contact does not answer, the system will leave a message letting the \guardian know that an event has occurred. If they do answer, they can let the system know if they are able to help or not, and if they say they are currently unable to help, the system will treat it as a failed attempt to contact.
+
+Apart from the above behaviours, the system should behave as follows when configuring new users and devices:
+
+The new user must be configured through the web-interface. When they are added, it is necessary to include enough information so that it is possible for contacts to identify them. A contact list is also created, where the contacts the system should contact after a fall accident, can be added. The contacts are prioritized, and will be contacted in the specified order when a falling accident happens. 
+
+A new fall-detection device should be configured for the user, but it is not required that the user has a device.
+The new device can possibly be an app for a smartphone, a voice-assistant configured for fall-detection, or other IoT enabled devices. These devices are coupled with a specific user upon configuration.
+
+
+
+\section{Functional requirements}
+From the above we get that the system should have the following functional requirements. The system should:
+
+\begin{itemize}
+    \item Be able to detect when a citizen has had a fall accident and send an alarm.
+    
+    \item Be able to notify one or more contact persons when an alarm has been send.
+    
+    \item Be able to setup and edit users and citizens from a web-portal.
+    
+    \item Be able to integrate IoT devices and wearable tech such as actuators and sensors, and utilize those devices for fall-detection.
+    
+    \item Be able to register a configured device to a user
+    
+\end{itemize}
+
+
+\todo{Outro}
