@@ -1,0 +1,53 @@
+In this chapter we will talk about the implementation of our server.
+
+\section{Choice of Server Hosting}
+We have looked at the pros and cons of hosting our server as a vertual machine and as serverless on a cloud computing platform.
+
+We have thought about setting up a virtual machine to host our server, as it was the traditional way to do things, and it would have been sufficient for our project. It would allow hosting of web server, API and database all in one place. But it is not very scalable as the system is limited to what is dedicated to the VM. More VMs can be started, but will still run independent of each other, and doing so would also require another system to host the database for it to be accessible to all VMs.
+
+An alternative would then be to use a cloud hosting solution. Cloud hosting solutions offer Lambda functions, which is code that can be run in the cloud while being serverless. This allows the code to scale wide, as it doesn't depend on the underlying server or other running code, and an infinite number of lambdas can be run in parallel. Other resources such as databases are also hosted independent, and can be accessed by using endpoints.
+
+We have chosen to continue working with cloud hosting solutions because they are the new way to host web services, and because they are scalable by design.
+
+Many cloud hosting solutions exist including Amazon AWS, Google Cloud, and Microsoft Azure. Since we also have an Amazon Echo to integrate with the service, we have chosen to use Amazon AWS to host our server.
+
+\section{AWS}
+AWS contains several different solutions that can be used to implement the server. In this section we explain the different AWS services that we have used to implement our server.
+
+\subsection{Lambda}
+Lambda functions are pieces of code that can be called from another AWS service, or directly over the internet. They can we programmed using Java, C\#, Python, and Node.js. When running, the lambda runs the script, and nothing more. Since there is no real server for the script to run on, there also isn't any system to handle dependencies and the like, so they have to be uploaded together with the script for each lambda, or alternatively added to S3.
+
+It is also possible to control the Lambdas, limit how much RAM a lambda can use, and how long it can run before it should timeout. Security policies also restricts the lambda so that it can only interact with other specific AWS services if it has been allowed to do so.
+
+Lambdas can also be tested directly, as it is possible to create test data directly from the editor, and run the lambda function on that test data.
+
+\subsection{RDS}
+RDS is the Relational Database Service, and can be used to create instances of databases. It is possible to host most big database types, including PostgreSQL that we have chosen to use for our solution. It is also possible to specify how powerful the database is, as well as how big it should be.
+
+RDS also uses EC2 security groups to control who can access databases. And every possible connection requires its own rule. So if the database should be accessable directly and from home, that is two specific IP addresses that have to be whitelisted, down to protocol and port for the connection.
+
+\subsection{API Gateway}
+The API Gateway can be used for creating a REST api by using a user interface. From here it is possible to specify what resources the API should have, as well as what methods each resource has. The API allows the call to then interact with other AWS services, such as Lambdas.
+The API Gateway also allows restriction of the API, so that API keys are required, or only specific users use the method.
+
+\subsection{IAM}
+IAM is a tool for administrating permissions to AWS services.
+
+\subsection{SOMETHING ABOUT TALKING WITH PHONES} \todo{Something about talking with phones}
+
+\todo{I de efterfølgende sektioner vil vi snakke om vores implementering}
+
+\section{S3}
+\todo{Vi vil nok hoste filerne til vores kontrolpanel i S3}
+
+\section{API}
+\todo{Hvordan den er designet, permissions etc.}
+
+\section{Database}
+\todo{Hvordan den ser ud etc.}
+
+\section{Server}
+\todo{Vores serverless server}
+
+\section{Pricing}
+\todo{In this chapter we will talk about the cost of hosting the server this way}
