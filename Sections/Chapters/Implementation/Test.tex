@@ -1,0 +1,63 @@
+\section{API test} \todo{august is writing this}
+This section describes the different kinds of tests we performed to ensure that the basic functionality of our API was working properly. Three main areas was tested, alarms, devices, and users. 
+
+The tests are written in Python, using the \textit{unittest} library that comes with the is bundled with the language \cite{unittest}. The framework is inspired by JUnit and other similar frameworks for writing and running unit test.
+
+\subsection{Alarm test}
+
+
+\subsection{Device test}
+
+
+\subsection{User test}
+
+
+
+\section{App test}
+In order to test some of the basic functionality and UI of the app, we use Xamarin.UITest. Using UITest means that while testing we do not know what data the app contains, but only what is on the UI. This is then usefull to determine that the right UI-elements appear in the right places, and that the functionality behind works as intended. We use this method to test mainly because it lets us test both the UI and the functionality at the same time. This saves development time, and if in the future we should decide on further development, it will be useful to have this kind of test already implemented.
+Another benefit is that with this kind of test implemented, we can implement automated UI tests in the future using Xamarin Test Cloud. Xamarin Test Cloud tests the app across multiple devices at once, in order to ensure that the app works on many different hardware platforms. 
+
+\begin{figure}[ht]
+    \centering
+    \begin{lstlisting}
+        private void LogInCitizenUser()
+        {
+            app.EnterText(c => c.Marked("UserName"), "a");
+            app.EnterText(c => c.Marked("Password"), "b");
+            app.Tap(c => c.Marked("LogInButton"));
+        }
+        \end{lstlisting}
+    \caption{Example of login}
+    \label{fig:test:loginFunction}
+\end{figure}
+
+Figure \ref{fig:loginFunction} is an example of logging in in the app inside the testing framework in order to test the log-in functionality. Elements are found by their ID's, which is manually specified in the corresponding view.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}
+        [Test]
+         public void CallForHelpCancel()
+         {
+             LogInCitizenUser();
+ 
+             AppResult[] helpButton = app.WaitForElement(c => c.Marked("helpButton"), "Did not see the success message.",
+                 new TimeSpan(0, 0, 0, 90, 0));
+ 
+             app.Tap(c => c.Marked("helpButton"));
+ 
+             AppResult[] respons = app.WaitForElement(c => c.Marked("NoHelp"), "Did not see the success message.",
+                 new TimeSpan(0, 0, 0, 90, 0));
+ 
+             app.Tap(c => c.Marked("NoHelp"));
+ 
+             AppResult[] resualt = app.WaitForElement(c => c.Marked("helpButton"), "Did not see the success message.",
+                 new TimeSpan(0, 0, 0, 90, 0));
+ 
+             Assert.IsTrue(resualt.Length == 1);
+         }
+    \end{lstlisting}
+    \caption{Code for cancel call for help}
+    \label{fig:test:cancelHelp}
+\end{figure}
+In the example \ref{fig:test:cancelHelp} the code used to test if we are able to cancel an event is shown. This code tests two things, whether or not the right UI elements show up at the right time, and whether or not the functionality actually lets us cancel an event.

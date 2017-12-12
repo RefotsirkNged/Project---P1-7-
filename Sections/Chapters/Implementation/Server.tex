@@ -1,53 +1,405 @@
-In this chapter we will talk about the implementation of our server.
+In this chapter the implementation of the server-side of the system is described. \todo{Kilder hvor relevant}
 
 \section{Choice of Server Hosting}
-We have looked at the pros and cons of hosting our server as a vertual machine and as serverless on a cloud computing platform.
+Two different options was investigated with regards to the hosting of the web-service. The first option researched, was to host the system on a web server. This could either be done as a dedicated or virtual server. The second option was to host it on a cloud computing platform.
 
-We have thought about setting up a virtual machine to host our server, as it was the traditional way to do things, and it would have been sufficient for our project. It would allow hosting of web server, API and database all in one place. But it is not very scalable as the system is limited to what is dedicated to the VM. More VMs can be started, but will still run independent of each other, and doing so would also require another system to host the database for it to be accessible to all VMs.
+It was considered to set up a virtual machine to host the web service, as it is the traditional way to do things, and it would most likely have been sufficient for this project. It would have allowed for the web server, API and database to be hosted in one place. However, this solution would not be very scalable, as the system would be limited by a physical or virtual server, that may or may not be scalable. More virtual machines could be started, but would still run independent of each other, and doing so would also require another system to host the database for it to be accessible to all machines.
 
-An alternative would then be to use a cloud hosting solution. Cloud hosting solutions offer Lambda functions, which is code that can be run in the cloud while being serverless. This allows the code to scale wide, as it doesn't depend on the underlying server or other running code, and an infinite number of lambdas can be run in parallel. Other resources such as databases are also hosted independent, and can be accessed by using endpoints.
+The alternative option was to use a cloud hosting solution. Cloud hosting solutions offers compute services, which is code that can be run in the cloud while being serverless. This allows the code to scale wide, as it doesn't depend on the underlying server or other running code, and an theoretically infinite number can be run in parallel. Other resources such as databases are also hosted independent, and can be accessed by using endpoints.
 
-We have chosen to continue working with cloud hosting solutions because they are the new way to host web services, and because they are scalable by design.
+It has been chosen to use a serverless, cloud hosting solution, because of the high flexibility and scaleablity that this allows. Further more, it allows us to use less time setting up a server, and the different solutions needed for a project like this, than by using a classic web server.
 
-Many cloud hosting solutions exist including Amazon AWS, Google Cloud, and Microsoft Azure. Since we also have an Amazon Echo to integrate with the service, we have chosen to use Amazon AWS to host our server.
+Many cloud hosting solutions exist, some of which are: Amazon AWS, Google Cloud, and Microsoft Azure. To ease the implementation of the personal assistant, Amazon Echo, it has been decided to use Amazon AWS to host the web service.
 
 \section{AWS}
-AWS contains several different solutions that can be used to implement the server. In this section we explain the different AWS services that we have used to implement our server.
+\label{sec:aws}
+Amazon AWS contains several different services and solutions that can be used to implement the server. In this section the different AWS services that is used in the implementation of the web service are explained.
 
 \subsection{Lambda}
-Lambda functions are pieces of code that can be called from another AWS service, or directly over the internet. They can we programmed using Java, C\#, Python, and Node.js. When running, the lambda runs the script, and nothing more. Since there is no real server for the script to run on, there also isn't any system to handle dependencies and the like, so they have to be uploaded together with the script for each lambda, or alternatively added to S3.
+Lambda functions are pieces of code that can be called from another AWS service, or directly over the internet. They can be programmed using Java, C\#, Python, and Node.js. When running, the lambda runs the script, and nothing more. Since there is no real server for the script to run on, there also is not any system to handle dependencies, so they have to be uploaded together with the script for each lambda, or alternatively added to S3. S3 is further explained in section \ref{s3}.
 
-It is also possible to control the Lambdas, limit how much RAM a lambda can use, and how long it can run before it should timeout. Security policies also restricts the lambda so that it can only interact with other specific AWS services if it has been allowed to do so.
+It is possible to control the Lambdas, limit how much RAM a lambda can use, and how long they can run before they should timeout, limited to a maximum of 1.5GB of memory, and a running time of 5 minutes. Security policies also restricts the lambda such that that they can only interact with other specific AWS services if they have been allowed to do so.
 
-Lambdas can also be tested directly, as it is possible to create test data directly from the editor, and run the lambda function on that test data.
+Lambdas can be tested directly, as it is possible to create test data from the editor, and run the lambda function on that test data. Each test needs to be run manually.
 
 \subsection{RDS}
-RDS is the Relational Database Service, and can be used to create instances of databases. It is possible to host most big database types, including PostgreSQL that we have chosen to use for our solution. It is also possible to specify how powerful the database is, as well as how big it should be.
+RDS is the Relational Database Service, and can be used to create instances of databases. It is possible to host most common database types, including PostgreSQL, which has been chosen to use for this solution. It is also possible to specify how powerful the database is, as well as how big it should be.
 
-RDS also uses EC2 security groups to control who can access databases. And every possible connection requires its own rule. So if the database should be accessable directly and from home, that is two specific IP addresses that have to be whitelisted, down to protocol and port for the connection.
+RDS uses EC2 security groups to control who can access databases. And every possible connection requires its own rule. Such that if a database should be accessable directly and from a personal computer, the specific IP address has to be whitelisted, down to protocol and port for the connection.
 
 \subsection{API Gateway}
-The API Gateway can be used for creating a REST api by using a user interface. From here it is possible to specify what resources the API should have, as well as what methods each resource has. The API allows the call to then interact with other AWS services, such as Lambdas.
-The API Gateway also allows restriction of the API, so that API keys are required, or only specific users use the method.
+The API Gateway is used to create a REST API by using a user interface. From here it is possible to specify which resources the API should have, as well as what methods each resource has access to. It is possible to interact with many of the AWS systems through the API. The API Gateway also allows restriction of the API, so that API keys are required, or only specific users use the method.
 
 \subsection{IAM}
-IAM is a tool for administrating permissions to AWS services.
+IAM is a tool for administrating permissions for AWS services for developers. The tool is meant to control what AWS services can and can not do, to prevent services from access other services.
+It was also used to allow multiple users to interact with the same AWS services using different accounts managed through IAM.
 
-\subsection{SOMETHING ABOUT TALKING WITH PHONES} \todo{Something about talking with phones}
+\subsection{SNS}
+SNS stands for Simple Notification Service, and is a tool that allows for sending messages such as SMS, Email and App notifications. For app notifications AWS does not support iOS and Android directly, so Google Cloud Messaging or Apple Developer also needs to be set up.
 
-\todo{I de efterfølgende sektioner vil vi snakke om vores implementering}
+\subsection{S3} \label{s3}
+S3 stands for Simple Storage Service and is meant for storing and retrieving data. Use cases include storing files for sharing, scripts for use with AWS Lambda Functions, and HTML, CSS and JavaScript files for static websites. S3 is the recommended way to host a website, such as the one needed for our control panel. %https://aws.amazon.com/websites/
 
-\section{S3}
-\todo{Vi vil nok hoste filerne til vores kontrolpanel i S3}
+Websites hosted with S3 are also scalable, as the server can send the files to more people as there are more demands.
+
+\section{Model}\label{model}
+In this section the model used to represent elements on the server is explained.
+
+The model was made to make working on data easier and consistent on the server side, and to ensure the presence of fields in the data types. Three different models are used, where two of them have specialized sub-models.
+
+\subsection{User}
+User is a collection of models that describe the different users in the system.
+
+The users in the system are:
+\begin{itemize}
+    \item User: (id, name, email, role) \newline
+    The user is the base model for the users in the system. It is used as a middle step for parsing one of the other user types, as the system is unable to properly de-serialize into an inherited type.
+    \item Citizen: (id, name, email, role, [Contacts], [Device], address, city, postnr) \newline
+    The Citizen model describes the citizen.  
+    \item Contact: (id, name, email, role, [Devices]) \newline
+    The Contact model describes the Contact and its devices.
+    \item CitizenAdmin: (id, name, email, role, [Citizens]) \newline
+    The model for the user that administrates citizens.
+    \item UserAdmin: (id, name, email, role) \newline
+    The model for the user that can administrate everything.
+\end{itemize}
+
+
+\subsection{Device}
+Device is a collection of models that describe the different devices that the user can use, and the contents of them.
+
+The devices currently supported in the system are:
+\begin{itemize}
+    \item Device: (id, devicetype)
+    The base device, only used for certain error types, and and as a middle step for parsing one of the other types, as the system is unable to properly deserialize into an inherited type.
+    \item AppDevice: (id, devicetype, token, arn)
+    The AppDevice is the users smartphone. This device is automatically created when the user logs in. It contains the token that is used by SNS and Google Firebase to send notifications to the smartphone.
+    \item AlexaDevice: (id, devicetype, user\_id) 
+    The AlexaDevice is used to represent an Alexa connected to the user. The Alexa device contains the user identifer related to it, and is used for determining what user it should start an alarm for.
+    \item (IFTTTDevice (id, devicetype, token)
+    The IFTTTDevice is a device that contains a token for a users IFTTT connected device. When the user has fallen, the token can be used to activate certain devices in the users home.
+    \item SmsDevice: (id, devicetype, phone\_number) 
+    The SmsDevice is a device that represents a phone device that the system should send an SMS to in the case that a citizen has fallen.
+    \item PhoneCallDevice: (id, devicetype, phone\_numboer)
+    The same as SmsDevice, but with the intent of calling contacts instead of sending an SMS.
+\end{itemize}
+
+The reason SmsDevice and PhoneCallDevice are separate devices, is that the contact should be able to control if they want a SMS or call when getting notified.
+
+\subsection{Alarm}
+The Alarm model represents an ongoing alarm that a Citizen has activated. The Alarm has the form (status, citizen, contact). The status is an integer that represents how many contacts that have answered to the alarm, regardless if they can help or not. The citizen is the model of the citizen that has started the alarm. The Contact is the model of a contact that has said that it can help the citizen, if answering using the app. Until then, the Contact space is empty.
+
 
 \section{API}
-\todo{Hvordan den er designet, permissions etc.}
+In this section the API and underlying implementation is described. First the API itself is presented followed by descriptions of the functionality behind each endpoint.
+
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{|l|p{2cm}|p{2cm}|p{2cm}|p{2cm}|} \hline
+         Resource & GET & POST & PUT & DELETE \\ \hline
+         /Citizen/\{id\} & In: \newline - Citizen\_id \newline Out:  \newline - Citizen & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} \\ \hline
+         /Contact/\{id\} & In: \newline - Contact\_id \newline Out: \newline - Contact & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} \\ \hline
+         /Contact/ & In: \newline - \newline Out:  \newline - [Contact] & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} \\ \hline
+         /Citizen/\{id\}/Alarm & In: \newline - Citizen\_id \newline Out: \newline - Alarm & In: \newline - Citizen\_id \newline Out: \newline - Alarm & In: \newline - Alarm \newline Out: \newline - Alarm & In: \newline - Alarm \newline Out: \newline - Alarm \\ \hline
+         /.../\{id\}/Device & \cellcolor{gray!40} & In: \newline - Device \newline - User\_id \newline Out: \newline - Device & In: \newline - Device \newline Out: \newline - Device & In: \newline - Device \newline Out: \newline - Device \\ \hline
+         /User & In: \newline - email \newline - password \newline Out: \newline - User & In: \newline - User \newline Out: \newline - User & In: \newline - User \newline Out: \newline - User & In: \newline - User \newline Out: \newline - User \\ \hline
+    \end{tabular}
+    \caption{Api calls}
+    \label{table:api}
+\end{figure}
+
+The resources on table \ref{table:api} uses the abbreviations Ci\_id, Ca\_id, and Us\_id for ids where the id is given as part of the URL path.
+
+When the API states that it returns Citizens, Contacts, Users, Devices, or Alarms it refers to the full serialized models described in \ref{model}. Even when dealing with errors or representing deleted content, the models are used, just with empty fields and negative id.
+
+\subsection*{Mapping} \label{api:mapping}
+
+
+\subsection*{Structure}
+All AWS Lambda Functions follow the same general structure to make input and output with the API simple and consistent.
+All input happens through the event, which is a (string,string) dictionary with the input mapped in \ref{api:mapping}.
+It returns an HTML request response with a status code, body and headers.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+        def lambda_handler(event, context)
+            try:
+                input_var1 = event["input_var1"]
+                ...
+                
+                if not input_var1:
+                    # Return error since we have unassigned variables
+                    
+                # LOGIC
+                
+                return respond(statuscode, serializedobject)
+            except:
+                return respond(statuscode, errorobject)
+    \end{lstlisting}
+    \caption{The base structure of a lambda function}
+    \label{fig:samplelambdafunction}
+\end{figure}
+
+On figure \ref{fig:samplelambdafunction} it can be seen that it takes event and context as input. Context is never used, but contains information about the AWS Lambda Function itself.
+First all arguments are retrieved from event, and assigned. Sometimes they are also deserialized if a model object is expected. Afterwards some error handling is done, before the main logic of the lambda is done.
+Response is built from a status code, and the object that it should return. The AWS Lambda Functions does always return an object as shown on figure \ref{table:api}
+
+When returning an error, an object is constructed that follow the same pattern as the otherwise correct object, but with a negative ID, and most other fields as empty strings or arrays, since the error doesn't contain any info.
+
+\subsection*{/User}
+The user resource is used for creating and editing users. Making a GET request works as a login, as it unlike all other requests doesn't use the model for requests.
+
+\subsubsection*{Password security}
+When a user has created an account they have also provided a password. To keep the passwords secure, they were salted and hashed, so that only the salt and hashed version of the password were saved in the database.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+    def get_salt():
+        return uuid.uuid4().hex
+
+
+    def hash_password(password, salt):
+        return hashlib.sha512((password + salt).encode('utf-8')).hexdigest()
+    \end{lstlisting}
+    \caption{Functions for getting salt and hash password}
+    \label{fig:passwordhashing}
+\end{figure}
+
+All salt have been generated by using Pythons built-in uuid library\cite{Python:UUID}. The library recommends uuid4 for a random UUID, and the function returns a string of 32 hexadecimal digits. The salt were used to ensure that even if two users have had the same password, it would be stored as different hashed passwords in the database.
+
+When the user have been created, the password is run though a hashing function seen on \ref{fig:passwordhashing} with the salt, and the same function is used again when the user tries to login. On a login the password the user have tried to login with have been hashed with the same salt, and the two hashed passwords are compared. If the hashed passwords are identical the user would be returned. Otherwise an fault user would be returned.
+
+
+\subsection*{/Citizen/\{id\}}
+When an useradmin or citizenadmin needs to request individual users, it is done by adding the citizens id as part of the request.
+
+\subsection*{/Contact/\{id\}}
+Like with the citizen, a specific contact is requested by adding the contacts id as part of the request.
+
+\subsection*{/Contact}
+When administrating a citizen with the control panel it is necessary to find contacts in the system. 
+
+\subsection*{/Citizen/\{id\}/Alarm}
+When a citizen have raised an alarm, an alarm object is created. 
+
+\subsection*{/.../\{id\}/Device}
+This resource is used by both Citizen and Contact to interact with their devices.
+
+
+\subsection*{Authentication}
+
+To ensure that users only access the parts of the API that they are allowed to, an authentication layer has been added. When a user logs in, they are given an authentication token. This token needs to be provided together with any request made to the rest of the API to ensure that they only have access to the things that they need. It also prevents unauthorized people from doing malicious things. Table \ref{table:auth} shows which resources and methods each user can access.
+
+
+% Please add the following required packages to your document preamble:
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[H]
+\centering
+
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+                    & Citizen                                                     & Contact                                                     & User admin                                                  & Citizen admin            & No auth                                        \\ \hline
+/citizen/id/        & GET                                                         & \cellcolor[HTML]{9B9B9B}{\color[HTML]{9B9B9B} }             & GET                                                         & GET                      & \cellcolor[HTML]{9B9B9B}                                 \\ \hline
+/contact/id/        & \cellcolor[HTML]{9B9B9B}                                    & \cellcolor[HTML]{9B9B9B}{\color[HTML]{9B9B9B} }             & \cellcolor[HTML]{9B9B9B}                                    & \cellcolor[HTML]{9B9B9B} & \cellcolor[HTML]{9B9B9B}                                 \\ \hline
+/contact/           & GET                                                         & GET                                                         & GET                                                         & GET                      & \cellcolor[HTML]{9B9B9B}                                 \\ \hline
+/citizen/id/alarm/  & POST                                                        & \begin{tabular}[c]{@{}l@{}}GET\\ POST\end{tabular}          & \cellcolor[HTML]{9B9B9B}                                    & \cellcolor[HTML]{9B9B9B} & \cellcolor[HTML]{9B9B9B}                                 \\ \hline
+/citizen/id/device/ & \begin{tabular}[c]{@{}l@{}}POST\\ PUT\\ DELETE\end{tabular} & \cellcolor[HTML]{9B9B9B}                                    & \begin{tabular}[c]{@{}l@{}}POST\\ PUT\\ DELETE\end{tabular} & \cellcolor[HTML]{9B9B9B} & \cellcolor[HTML]{9B9B9B}                                 \\ \hline
+/contact/id/device/ & \cellcolor[HTML]{9B9B9B}                                    & \begin{tabular}[c]{@{}l@{}}POST\\ PUT\\ DELETE\end{tabular} & \begin{tabular}[c]{@{}l@{}}POST\\ PUT\\ DELETE\end{tabular} & \cellcolor[HTML]{9B9B9B} & \cellcolor[HTML]{9B9B9B}                                 \\ \hline
+/user/              & \cellcolor[HTML]{9B9B9B}                                    & \cellcolor[HTML]{9B9B9B}                                    & \cellcolor[HTML]{9B9B9B}                                    & \cellcolor[HTML]{9B9B9B} & \begin{tabular}[c]{@{}l@{}}GET\\ POST\\ PUT\end{tabular} \\ \hline
+\end{tabular}
+\caption{Table of user authorizations}
+\label{table:auth}
+\end{table}
+
+The AWS API Gateway includes a tool to add authorizers to an API. This is done by defining an AWS lambda function to handle the authorization request, which returns an IAM, explained in section \ref{sec:aws}. The authorizer takes an authentication token as a parameter, the source of which must be defined when setting up the authorizer, in this case, the source is a header called \textit{token}.
+
+The token is generated using the JSON Web Tokens (JWT) standard \cite{JWT}. Due to the compact size of a JWT, this makes it possible to send it through the request header. Further more, it is self-contained, meaning that the token contains all required information, which means that a call to the database is not required during the authorization step. Each token is signed using a secret string.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+    Header:
+    {
+        "typ": "JWT",
+        "alg": "HS256"
+    }
+    
+    Payload:
+    {
+        "user_id": "234",
+        "user_role": "citizen"
+    }
+    
+\end{lstlisting}
+    \caption{Decoded JSON Web Tokens}
+    \label{fig:jwt-decoded}
+\end{figure}
+
+A JWT consists of three parts, namely the header, payload and signature. An example of a JWT, used in the API test, can be found on table \ref{fig:jwt-decoded}. The header contains information about the type if the token, which is \textit{JWT}, and the hashing algorithm used, in this case \textit{HS256}. The payload contains the data that the token contains. In this example it contains a user id and user role, used by the authorizer to create the IAM. The third part, which is not shown in the example, is the signature part. This part contains information needed to verify the token, including the secret string needed to verify the token.
+
+The three parts of the JWT is encoded and separated by a period  ('.'). The encoded version of the example on figure \ref{fig:jwt-decoded} can be found on figure \ref{fig:jwt-encoded}.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+    eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.
+    eyJ1c2VyX2lkIjoiMjM0IiwidXNlcl9yb2xlIjoiY2l0aXplbiJ9.
+    Lk0L4BX6Dx0b6PlfWMlSp3xFv5o7lYmya2PyAc-FQdE
+\end{lstlisting}
+    \caption{Encoded JSON Web Tokens}
+    \label{fig:jwt-encoded}
+\end{figure}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 \section{Database}
-\todo{Hvordan den ser ud etc.}
+
+\todo{Sammenlign med design}
+
+In this section we will talk about the implementation of the database designed in section \ref{sec:databasedesign}. 
+
+We have chosen to use PostgreSQL as the DBMS of choice, since AWS RDS supports it, and it is a known dialect of SQL.
+
+To simplify things in the database, a few types were introduces: userrole and devicetype. Userrole is one of citizen, contact, or  citizenadmin, and is used to determine what the user is and where they can login, as well as determine what table to look in for additional information.
 
 \section{Server}
-\todo{Vores serverless server}
+The server is not really a server, since a serverless implementation has been used. Instead we have set up several AWS Lambdas that can be called when certain tasks needs to be run.
 
-\section{Pricing}
-\todo{In this chapter we will talk about the cost of hosting the server this way}
+For each action that can be performed through the API we have added a Lambda Function. This also allows for the lambda functions to not think about the REST API or HTTP requests, and can instead focus on performing its task.
+
+Each Lambda Function is uploaded to AWS as a zip file where the specific function is included together with its own dependencies as well as everything thats part of the shared functions.
+
+\subsection{Shared functions}
+
+All lambdas share a set of common functions and classes we have implemented. This includes the models that descibe the different models we have in the database, connection functions for the database, and the Psycopg2 library we use for communicating with the database.
+
+\subsubsection{Psycopg2}
+Psycopg2 is a library that allows python to interact with a PostgreSQL database. Since AWS does not provide this library itself we need to upload the library together with each lambda. A modified version of Psycopg2 compiled specifically for AWS Lambdas have been used.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+    conn = psycopg2.connect(connect_str)
+    cursor = conn.cursor()
+
+    cursor.execute("QUERY")
+    res = cursor.fetchone()
+    conn.commit()
+    cursor.close()
+    conn.close()
+\end{lstlisting}
+    \caption{Example of Psycopg2 interacting with a database}
+    \label{fig:psycopg2example}
+\end{figure}
+
+The code that can be seen in figure \ref{fig:psycopg2example} shows how the database can be interacted with. A connection is created using a connection string, containing info about the database and credentials. A curser can then be used to execute queries and fetch results. After using a database, the actions are committed and closed.
+
+
+\subsubsection{Boto3}    
+
+Boto3 is a python library created for interacting with Amazon AWS services. It can sens SMS messages to phones and notifications to smartphones, Upload files to S3, upload and call lambda functions, and 
+
+\iffalse
+The SNS library contains functions for creating, updating and calling endpoints for smartphones. This is used for when the lambda function needs to send a notification to the contacts smartphone, and works as a wrapper around AWS SNS.
+
+Since Android phones can change their device ID, the system also needs a way to update the endpoint, otherwise the contact may not be reachable when needed.
+
+the library just sends a string to the Android phone, and can thus be send anything as long as the Android device knows how to parse it.
+
+The library can also be extended to create endpoints for other device types such as iPhones. It just needs to point to the new ARN endpoint instead.
+\fi
+
+\subsubsection{Marshmallow}
+
+Due to trouble with the built-in JSON library a third-party library was used instead. While it didn't eliminate the need for using the built-in JSON library entirely, it makes serialization and deserialization easier, as it makes it easier to avoid nesting JSON strings inside JSON strings.
+
+The library allows custom schemas to be defined for the objects, and can also be used to control how objects are serialized when inheritance is used.
+
+
+
+
+\subsection{Login}
+
+The login Lambda Function handles everything related lo login and verification. It basically works as a wrapper around the User Manager described in section \ref{impl:server:usermanager}. 
+If either the login information is incorrect, or it is missing, it will return only the id -1. Otherwise it will return the relevant user information, being all from the user table except the hashed password and salt.
+
+
+\subsection{Create Alarm}
+
+When a falling accident has happened, a message is sent to the Create Alarm Lambda Function. All this message currently contains is who has fallen. The Lambda Function will then add an alarm to the database, and retrieve the contacts of the citizen. The system then tries to contact the different contacts one at a time, until it finds someone who can respond. It then returns and notifies the citizens device about who is on the way to help.
+
+If a contact doesn't answer for a given duration, then the system moves on and tries to contact the next citizen on the list.
+
+\subsection{Update Alarm}
+
+When a contact responds to an alarm, they send a message back about who they are, if they can help, and what alarm they are responding to. If they answer that they can't help it gets notified in the system, so that the next contact can be contacted instead.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\iffalse
+
+\section{Pricing}\todo{Dobbelt tjek at udregniner er korrekte}
+
+AWS used a "pay for what you use" plan when calculating how much using their services cost. As a result it is possible to calculate how much having a user using the sytem will cost.
+
+We will make the calculations using the numbers from chapter \ref{preliminaries:problemanalysis}, where we know that 1 in 3 over 65 has a falling accident each year. There are 1.074.422 citizens over 65 years \cite{numberofelders}, and if they all were to use our application, then it would result in 358.141 falling accidents yearly.
+
+In the calculations we exclude the use of the control panel. The prices may change with time.
+
+\paragraph{Lambda}
+
+The first 1.000.000 requests each month are free, afterwards it cost \$0.20 for every 1.000.000 requests.
+For running time, the system bills for how much memory is used per 100 ms. The first 400.000 GB seconds of execution time are free each month. Since the Lambdas by default are limited to 512 MB of memory, we use that as our example, and it costs \$0.000000834 pr 100 ms of execution time. At this usage, the free tier gives 800.000 seconds of free execution every month.
+
+When rising an alarm, the alarm lambda can run for up to 5 minutes. Each response runs for 200 ms. We assume 4 contacts are contacted on average. That means that each alarm runs on the server for 300.800 ms.
+
+With 358.141 falling accidents, that gives a total execution time of 107.728.812.800 ms, over 1.790.705 lambda calls.
+This gives a total cost of ~\$900 in execution time, and just shy of \$4 in lambda calls.
+
+But if we include the free calls and time, and assume the falls are distributed evenly over the year, the used time is $107.728.812.800 ms - (800.000.000 ms * 12) = 98.128.812.800 ms$ which bills for ~\$820
+
+\paragraph{API Gateway}
+
+The API Gateway costs \$3.50 for every million calls made, with a total number of calls of 1.790.705. If we assume each call carries 3kb of data total, we will send a total of 5.372.115 kb of data, which will be charged at \$0.09 / GB.
+
+This gives a total usage of ~\$6.50 for calls and ~\$0.50 for data.
+
+\paragraph{RDS}
+\todo[inline]{A little more complex, so not calculated yet.}
+
+
+\paragraph{SNS}
+
+The first million mobile push notifications each month are free, after which they cost \$0.50 per million. There is also a price on the total size of sent data, the the price is based on how much data that has been sent. If we again assume 3KB we send a total of 1.432.564 notifications for a total data usage of 4.297.692 Kb or ~4.3GB. At a price of \$0.090/GB the cost can be overlooked.
+
+\subsection{Conclusion}
+From the above calculations we can come to the conclusion that running the server using AWS will cost a total of \todo{Final cost here}. From this we have come to the conclusion that it will not cost a lot t run a server with AWS, and it doesn't have to be maintained.
+
+The actual cost will be higher, but can be hard to guess as it will depend on how much people use the control panel, and how many false alarms the system will register. 
+
+\fi

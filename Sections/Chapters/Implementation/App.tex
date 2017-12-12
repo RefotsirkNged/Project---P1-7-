@@ -1,15 +1,112 @@
-This chapter will look at the implementing of the smartphone app and choice of implementation tool.
+This chapter describes the implementation of the smartphone app and the different decisions made during this phase of the development. 
 
-\section{Platform}
-The choice of platform will chance the code and the easy of program the app to different platforms, there are 3 big platform we could develop for, those would be android, IOS or xamarin where xamarin is a cross platform implementation. we will look at those platforms main IDE so for android we will look at android studio instead of all the other possible IDE like eclipse or intellegie.
+\section{Target Platform}
+The first decision we had to make was which platforms to target. This decision has an impact on the potential userbase of the app. It is not ideal if potential users are kept from using our system due to the platforms it is available on.
+The two main platforms we considered developing for is Android and IOS. To facilitate development for both platforms we decided on using Xamarin \cite{xamarin} as our development platform. 
+Xamarin is a development platform designed with cross-platform app development in mind. 
+It enables reuse of significant parts of the code, thus cutting down the potential development time needed to develop for multiple platforms. 
+The individual platforms has dedicated IDE’s each(XCode\cite{xcode} for IOS, and Android Studio for Android), but none of those can facilitate the same cross-platform development that Xamarin can. 
+The development of a full app for both platforms is however not the focus of this project, and as such we will only develop for Android as a sort of proof of concept. Development will still be done using Xamarin.
 
-\subsection{XCode}
-XCode is apple development tool to create apps for iphone and Mac OS, you can program in object C and swift to develop those apps and programs.
+\section{Libraries used}
+We are using a few different libraries in the android version of the app. We chose to use these libraries to speed up the development process, and to help implement things in a proper way.
+\begin{itemize}
+    \item Rendy Del Rosario/FirebasePushNotificationPlugin
+    \item Wilson Vargas/ButtonCircle
+    \item Xamarin additional libraries
+    \item dsplaisted/PCLStorage
+\end{itemize}
 
-\subsection{Android Studio}
-android studio is Google IDE to develop for android, this is in java this allow to use any existing java library to create you app with a few exemption.
+ButtonCircle is a simple library for creating a round button.
+PCLStorage is a cross platform library for handling file IO on various mobile platforms - including Android and IOS. While an android specific library (or native android functionality) could have been used, we decided to use PCLStorage to prepare for future development on a different platform.
 
-\subsection{Xamarin}
-Xamarin is a Microsoft platform that can develop for iPhone and android at the same time, this is done in C\# and then some code specif for the platform that you are developing for, some part of code is platform specific for android or iPhone and need to be implement specific for them but will still be programmed in C\#
+\section{Server communication}
+Communication with the backend of the system is done through a Rest-API. 
+\begin{figure}[h]
+    \centering
+    \begin{lstlisting}
 
-%XCode IOS
+    HttpWebRequest request = (HttpWebRequest) HttpWebRequest.Create(url);
+    request.Method = "GET";
+    request.Headers.Add("email", UsernameText);
+    request.Headers.Add("password", PasswordText);
+
+    using (var response = request.GetResponse())
+    {
+        switch (((HttpWebResponse)response).StatusCode)
+        {
+            case HttpStatusCode.OK:
+                using (var reader = new StreamReader(response.GetResponseStream()))
+                {
+                    string json = reader.ReadToEnd();
+                    json = JsonConvert.DeserializeObject<dynamic>(json) ["body"].ToString();
+                    currentUser = JsonConvert.DeserializeObject<User>(json);
+                    currentUser.jsonCredentials = json;
+
+                    if (currentUser.contacts == null && currentUser.id != -1)
+                    {
+                        CreateUserCredentialsFile(currentUser);
+                        return true;
+                    }
+
+                    currentUser.setNumber();
+                }
+                if (currentUser.id != -1)
+                {
+                    CreateUserCredentialsFile(currentUser);
+                    return true;
+                }
+                break;
+
+            default:
+                CrossPlatFormMethod.WriteTextToScreen("Kunne ikke forbinde til serveren.");
+                return false;
+        }
+    }
+\end{lstlisting}
+    \caption{Login in to the server}
+    \label{fig:appLogIn}
+\end{figure}
+In the figure \ref{fig:appLogIn} we have an example of the login \textit{GET} request that returns a citizen/contact. When a successful request is made, the recieved object is then deserialized. First, it is converted to an object of type dynamic, containing only the body of the JSON object, since the only part of the response object we are interested in is the body. The next step is then then to deserialize the content of the body into our model of a user. Seperate checks are made to find out whether or not a user has a phonenumber or not, and if they do, an additional deserialization is made to save the phonenumber.
+
+\section{Firebase Cloud Messaging}
+We use Firebase Cloud Messaging(FCM) which is developed by Google to facilitate the usage of push notifications on android. FCM works by utilizing a background service, which watches for new messages. The setup for FCM specifically gave us some troubles during the development, and it was decided to use a library to handle most of the setup (FirebasePushNotificationPlugin by Rendy Del Rosario).
+
+FCM handles user registration using tokens, which is stored on the server-side whenever a token refresh or creation happens.
+
+\section{Cross Platform}
+We chose to use Xamarin since this allowed us to make it easier to create the app for both android and IOS. But, even though Xamarin allows for code reuse between platforms, we still need platform specific code in some cases. This is done through a class called \textit{CrossPlatformMethod}, which contains a set of static methods allowing us to perform certain actions without having to consider how to do it on each platform.
+
+\begin{figure}[h]
+    \centering
+    \begin{lstlisting}
+    public static void WriteTextToScreen(string message)
+    {
+        #if __ANDROID__
+            Toast.MakeText(Xamarin.Forms.Forms.Context, message, ToastLength.Long).Show();
+        #elif IOS
+        #endif
+    }
+    \end{lstlisting}
+    \caption{Multi pathform code}
+    \label{fig:appMultiPlatform}
+\end{figure}
+In figure \ref{fig:appMultiPlatform} we use directives to say tell the compiler what part of the code it should compile down to the different platforms. We have only implemented the app for Android, but having a class like \ref{fig:appMultiPlatform} makes it easier to implement the app on IOS in the future.
+
+\section{MVVM Pattern}
+We are using the MVVM(Model View ViewModel) pattern so that we can separate the view design and the code-behind to make it easier to maintain and change things down the line. It also lets us work on views and viewmodels concurrently, and therefore speeds up the development process. These elements (models, views and viewmodels) are created so that they can be reused for all platforms. The usage of MVVM does have some side effects, as it forces us to work with screens differently from what is normally done on the android platform. One specific example is that the back button on an android phone does not work to navigate between the different screens, due to the fact that in native android a views are normally separate activities, which they are not in our MVVM model.
+
+
+
+\section{Usability}
+The usability of the app is not a very important part of this project. It is however still designed with disoriented/elderly people in mind. 
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.1]{Figures/usabapp.png}
+    \caption{Caption}
+    \label{fig:usabapp}
+\end{figure}
+
+
+On \ref{fig:usabapp} is the screen a user of the system is presented with when confirming or aborting a call for help. The buttons and text are made large on purpose, to make it easier for the target audience to see and use the buttons. Other than this, no usability testing has been performed, as it is not the main focus of this project.
