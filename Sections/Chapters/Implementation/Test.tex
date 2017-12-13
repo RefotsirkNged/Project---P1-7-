@@ -1,10 +1,47 @@
 \section{API test} \todo{august is writing this}
-This section describes the different kinds of tests we performed to ensure that the basic functionality of our API was working properly. Three main areas was tested, alarms, devices, and users. 
+This section describes the different kinds of tests we performed to ensure that the basic functionality of our API was working properly. The tests has been split into three parts, alarm, device and user. Together these covers the API endpoints\todo{Hedder det endpoints?}.
 
-The tests are written in Python, using the \textit{unittest} library that comes with the is bundled with the language \cite{unittest}. The framework is inspired by JUnit and other similar frameworks for writing and running unit test.
+The tests are written in Python, using the \textit{unittest} library that is bundled with the language \cite{unittest}. The framework is inspired by JUnit and other similar frameworks for writing and running unit test.
 
 \subsection{Alarm test}
+For the Alarm, the \textit{GET, POST} and \textit{DELETE} has been tested. The setup for this test adds a citizen to the system and the tear down makes sure to delete it again. The test itself is found on figure \ref{fig:test-alarm}.
 
+
+\begin{figure}[H]
+    \centering
+    \begin{python}
+def test_alarm_post_get_delete(self):
+        self._alarm = Alarm(0, self._citizen, None)
+        alarm_post_header = {"alarm": self._alarm.serialize().replace("\"", "\\\""), "token": "TOKEN"}
+
+        alarm_uri = "https://.../citizen/" + str(self._citizen.id) + "/alarm"
+
+        self._alarm = alarm.deserialize(
+            get_response(requests.post(alarm_uri, headers=alarm_post_header)))
+        self._alarm_response = alarm.deserialize(
+            get_response(requests.get(alarm_uri,  headers=alarm_post_header)))
+
+        alarm_delete_header = {"alarm": self._alarm.serialize().replace("\"", "\\\""), "token": "TOKEN"}
+        alarm_uri = "https://.../citizen/" + str(self._citizen.id) + "/alarm"
+
+        _alarm_delete = alarm.deserialize(
+            get_response(
+                requests.delete(alarm_uri, headers=alarm_delete_header)))
+
+        self.assertDictEqual(
+            json.loads(self._alarm.serialize().replace("'", "\"")
+                .replace("None", "null")), 
+            json.loads(self._alarm_response.serialize()
+                .replace("'", "\"").replace("None", "null"))
+        )
+            
+        self.assertEqual(-1, _alarm_delete.status)
+        \end{python}
+    \caption{Example of login}
+    \label{fig:test-alarm}
+\end{figure}
+
+First a new alarm is posted to the system from the user created during setup, this alarm is then gotten through a get request, both of these are then saved as variables and the alarm is then deleted. The test now asserts if the parameters of the posted and gotten alarm are equal. Lastly it is asserted if the alarm returned from the delete request has a status of -1, which indicates that the 
 
 \subsection{Device test}
 
@@ -17,7 +54,7 @@ The tests are written in Python, using the \textit{unittest} library that comes 
 In order to test some of the basic functionality and UI of the app, we use Xamarin.UITest. Using UITest means that while testing we do not know what data the app contains, but only what is on the UI. This is then usefull to determine that the right UI-elements appear in the right places, and that the functionality behind works as intended. We use this method to test mainly because it lets us test both the UI and the functionality at the same time. This saves development time, and if in the future we should decide on further development, it will be useful to have this kind of test already implemented.
 Another benefit is that with this kind of test implemented, we can implement automated UI tests in the future using Xamarin Test Cloud. Xamarin Test Cloud tests the app across multiple devices at once, in order to ensure that the app works on many different hardware platforms. 
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \begin{lstlisting}
         private void LogInCitizenUser()
@@ -31,7 +68,7 @@ Another benefit is that with this kind of test implemented, we can implement aut
     \label{fig:test:loginFunction}
 \end{figure}
 
-Figure \ref{fig:loginFunction} is an example of logging in in the app inside the testing framework in order to test the log-in functionality. Elements are found by their ID's, which is manually specified in the corresponding view.
+Figure \ref{fig:test:loginFunction} is an example of logging in in the app inside the testing framework in order since we need to log in in every test case. Elements are found by their ID's, which is manually specified in the corresponding view, then you can specify a action like enter text or tap.
 
 \begin{figure}[H]
     \centering

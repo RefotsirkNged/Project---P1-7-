@@ -4,9 +4,9 @@ This chapter describes the implementation of the smartphone app and the differen
 The first decision we had to make was which platforms to target. This decision has an impact on the potential userbase of the app. It is not ideal if potential users are kept from using our system due to the platforms it is available on.
 The two main platforms we considered developing for is Android and IOS. To facilitate development for both platforms we decided on using Xamarin \cite{xamarin} as our development platform. 
 Xamarin is a development platform designed with cross-platform app development in mind. 
-It enables reuse of significant parts of the code, thus cutting down the potential development time needed to develop for multiple platforms. 
+It enables reuse of significant parts of the code, thus cutting down the potential development time needed to develop for multiple platforms. Some platform-specific code is still necessary for performing platform specific actions, like performing visual actions that is not handled through the Xamarin framework, and setting up permissions specifically for each platform.
 The individual platforms has dedicated IDE’s each(XCode\cite{xcode} for IOS, and Android Studio for Android), but none of those can facilitate the same cross-platform development that Xamarin can. 
-The development of a full app for both platforms is however not the focus of this project, and as such we will only develop for Android as a sort of proof of concept. Development will still be done using Xamarin.
+The development of a full app for both platforms is however not the focus of this project, and as such we will only develop for Android as a sort of proof of concept. Development will still be done using Xamarin. 
 
 \section{Libraries used}
 We are using a few different libraries in the android version of the app. We chose to use these libraries to speed up the development process, and to help implement things in a proper way.
@@ -70,12 +70,12 @@ Communication with the backend of the system is done through a Rest-API.
 In the figure \ref{fig:appLogIn} we have an example of the login \textit{GET} request that returns a citizen/contact. When a successful request is made, the recieved object is then deserialized. First, it is converted to an object of type dynamic, containing only the body of the JSON object, since the only part of the response object we are interested in is the body. The next step is then then to deserialize the content of the body into our model of a user. Seperate checks are made to find out whether or not a user has a phonenumber or not, and if they do, an additional deserialization is made to save the phonenumber.
 
 \section{Firebase Cloud Messaging}
-We use Firebase Cloud Messaging(FCM) which is developed by Google to facilitate the usage of push notifications on android. FCM works by utilizing a background service, which watches for new messages. The setup for FCM specifically gave us some troubles during the development, and it was decided to use a library to handle most of the setup (FirebasePushNotificationPlugin by Rendy Del Rosario).
+We use Firebase Cloud Messaging(FCM) which is developed by Google to facilitate the usage of push notifications on android. FCM works by utilizing a background service, which watches for new messages. The setup for FCM specifically gave us some troubles during the development. Before trying to use FCM, we tried to setup an older solution from google, Google Cloud Messaging (GCM). GCM however, proved difficult to setup. Due to this, and the amount of time that was spent on trying to make it work, it was decided to use FCM and a library instead. The library (FirebasePushNotificationPlugin by Rendy Del Rosario \todo{ref}) handles most of the setup involved in using FCM.
 
-FCM handles user registration using tokens, which is stored on the server-side whenever a token refresh or creation happens.
+FCM handles user registration using tokens, which we then store on the server-side whenever a token refresh or creation happens.
 
 \section{Cross Platform}
-We chose to use Xamarin since this allowed us to make it easier to create the app for both android and IOS. But, even though Xamarin allows for code reuse between platforms, we still need platform specific code in some cases. This is done through a class called \textit{CrossPlatformMethod}, which contains a set of static methods allowing us to perform certain actions without having to consider how to do it on each platform.
+We chose to use Xamarin since this allowed us to make it easier to create the app for both android and IOS. But, even though Xamarin allows for code reuse between platforms, we still need platform specific code in some cases. This is done through a class we created called \textit{CrossPlatformMethod}, which contains a set of static methods allowing us to perform certain actions without having to consider how to do it on each platform, thus making it cross-platform. Each method then implements a version of the code that is compiled down to each platform. In our case, only the Android part is actually implemented, since that is the only platform we are developing for in this project. 
 
 \begin{figure}[h]
     \centering

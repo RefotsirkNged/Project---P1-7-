@@ -9,13 +9,14 @@ In this section, implementation of the control panel is described. The control p
     \label{fig:controlPanelLoginView}
 \end{figure}
 
-When a user tries to first enter the control panel, they will be presented with a login page. A users email and password, are used for authentication. The data is sent as a POST request to \todo{login url missing}. If the authentication is successful, the response is a tuple \todo{example data needed}. If the authentication failed, the response will be a tuple containing the status code 401 for unauthorized and -1 \todo{reason for -1}.
+When a user tries to first enter the control panel, they will be presented with a login page. A users email and password, are used for authentication. The data is sent via a POST request to the back-end. \todo{login url missing}. If the authentication is successful, the response is a tuple \todo{example data needed}. If the authentication failed, the response will be a tuple containing the status code 401 for unauthorized and -1 \todo{reason for -1}.
+Other than that, this page contains a register new user button. Currently, this button lets whoever uses it create a new user (Citizen or contact) \todo{nogen forklar det her bedre, i dont think this setup makes sense}
 
 
 \section{Citizen admin}
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.4]{Figures/ControlPanel/CitizenAdminView.png}
+    \includegraphics[scale=0.4]{Figures/ControlPanel/CitizenAdminView.PNG}
     \caption{The view presented for a user, with citizen admin role.}
     \label{fig:controlPanelCitizenAdminView}
 \end{figure}
@@ -38,11 +39,12 @@ There is also a search field, where it is possible to search for a phone number 
 
 
 \section{Admin}
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.5]{Figures/ControlPanel/AdminView.png}
-    \caption{The view presented for a user, with admin role.}
-    \label{fig:controlPanelAdminView}
-\end{figure}
+%\begin{figure}[H]
+ %   \centering
+ %   \includegraphics[scale=0.5]{Figures/ControlPanel/AdminView.png}
+ %   \caption{The view presented for a user, with admin role.}
+ %   \label{fig:controlPanelAdminView}
+%\end{figure}
+\todo{ skal skrive om siden admin view ikke er der}
 
-The admin view \ref{fig:controlPanelAdminView} is very simple. The admin user is only used to add new users of roles citizen and citizen-admin, therefor the view consist of a form that will send a POST request containing the data to \todo{add new user url missing}. \todo{response details}.
+%The admin view \ref{fig:controlPanelAdminView} is very simple. The %admin user is only used to add new users of roles citizen and %citizen-admin, therefor the view consist of a form that will send a %POST request containing the data to \todo{add new user url %missing}. \todo{response details}.
