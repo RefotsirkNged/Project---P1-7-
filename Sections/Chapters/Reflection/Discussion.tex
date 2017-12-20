@@ -1,0 +1,131 @@
+In this chapter we will discuss and reflect over the final product created alongside this report. The discussion covers the server and app, as well as the development method that has been used.
+
+\section{Server}
+
+In this section we will discuss and reflect over the server, and look at the effects from choice of server and language.
+
+\subsection{Choice of hosting service}
+It was chosen to use AWS to implement the web service. This decision included a learning curve on the large quantity of services that Amazon offer. The result of this was that a lot of time was spent on reading, and even more time debugging them when they did not work as we expected. Furthermore when a new service was introduced, the structure of the implementation had to be changed. When the decision was made to hide the database from being visible on the internet, days were spent trying to debug it. And the same was applied when SNS was added.
+
+This overhead could have been avoided by implementing the service on a dedicated server, as described in section \ref{sec:server-choice}. Taking this into consideration, choosing AWS was still the right choice. Serverless hosting solutions was a learning experience in both how to implement and general thought process throughout this project. AWS has also made some tasks that might be considerably more complicated on a traditional server, almost trivial, this includes the authentication process and setup of the API using the API Gateway.
+
+A lot of configuration in AWS happens through the Developer Console in a web browser. This is a user interface, hiding a lot of implementation details away so that it isn't available in the code, making it harder to read for someone who have not been part of setting it up. This also means that if a change has to be made many places in the user interface, it has to manually be done for every resource in every service. Some of these things could also have been done through the boto3 library, but that would take a lot of scripting ahead of time to automate. boto3 is a Python library made by Amazon for AWS, and can be used for interacting with everything on AWS.
+
+\subsection{Choice of Language}
+We chose to implement the server using the Python language. The decision was made because of the learning opportunity the language presented for most of the group. The language was also chosen because it is different from C\# and Java that are already well known languages to the group.
+
+However, coming from our object oriented(OO) background, trying to implement an OO model proved more difficult than anticipated. A lot of problems occurred with the lack of a static type system, when implementing the model.
+
+Python also gave some inconsistencies with JSON. There were some problems with getting the built-in library to work, so a third-party was used instead, which worked after a few changes related to inheritance. There were also some problems with JSON when sending over the API compared to when running the lambda directly, resulting in additional changes being made to the JSON being sent to the API.
+
+\subsection{Security}\label{reflection:server:security}
+Authentication currently guarantees that users only call the API endpoints that they are allowed to, but there are still multiple security problems present in the system.
+
+Beyond the initial authentication token there currently is nothing that limits what a user can modify, so a user could send a model with data imitating another user, and the server would apply it. A solution would be to keep the authentication token, and verify the input id for the user. 
+\todo{leap of logic}
+This could however be easily implemented using the already implemented JWT, as described in section \ref{sec:authentication}. JWT implements different options to make the token more secure. One of these is to add an expiration time to the token, such that the token only validates if it is within its time limit. This would require that the user requests a new token more often than when they first access the system.
+\todo{whaa? whats appdevice}
+AppDevice is currently created and deleted automatically by the smartphone, and includes information that the user should never see. It should never be sent from the server to the user, since it contains internal AWS data that should not be exposed to the user. The id of the device still needs to be available such that the token can be updated by the device.
+
+Another way to improve security is to move everything into a VPC. While it gives problems when using SNS, the problem can be solved by using a NAT (Network Address Translation). A NAT should allow the VPC to interact with the outside world, while still limiting what can make its way back into the VPC. This would remove the need for AWS Lambda Functions running both inside and outside the VPC.
+
+\subsection{User credentials validation}
+When creating a new user, the information received to create the new user in the database should be validated to make sure that the information is correctly formatted, and required information is present. Currently the only validation when creating a new user, is in the control panel before the request to make a new user is sent. The only validation is on whether or not the user creation input fields are empty.
+
+To improve the system, it is necessary that validation is implemented, especially in the cases of email and passwords. The email is a means of contacting the citizen and also used to login, so validating that the inputted email is formatted correctly is relevant. Verifying that the inputted email, is an existing email is also relevant. Setting requirements for the password is important, to make sure that users are not easily hacked. Requirements for the password could be the following:
+\begin{itemize}
+    \item Minimum length of 8 characters
+    \item At least one upper case character
+    \item At least one lower case character
+    \item At least one number
+\end{itemize}
+
+
+\subsection{Requests and Responses}
+In the beginning of the semester it was decided that information should be passed to the server using HTTP headers only, which have caused communication problems between the clients and server, since the info would normally be passed through the request body.
+This decision was made early on, since testing of the API happened through Postman \cite{postman}, where headers could be specified individually, and toggled on and off as needed for testing.
+
+The server was almost done with implementation before the Control Panel or app were hooked up to it, and as a result it was decided to require the Control Panel and App to use the HTTP headers instead of the body. In hindsight time should have been spent changing the API, so that it would use the body instead.
+
+And the response that the server would return would be equally misformed.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Javascript]
+    {
+        "statusCode": "200",
+        "body": "content",
+        "headers": {
+            "Content-Type": "application/json",
+        },
+    }
+    \end{lstlisting}
+    \caption{Properly structured HTTP response}
+    \label{fig:properhttpresponse}
+\end{figure}
+
+On figure \ref{fig:properhttpresponse} it shown how a correct response would be structured so that browsers/libraries would be able to parse the response.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Javascript]
+    {
+        "statusCode": "200",
+        "body": "{
+                    \"statusCode\": \"200\",
+                    \"body\": \"content\",
+                    \"headers\": {
+                        \"Content-Type\": \"application/json\",
+                    },
+        }",
+        "headers": {
+            "Content-Type": "application/json",
+        },
+    }
+    \end{lstlisting}
+    \caption{Malformed HTTP response}
+    \label{fig:malformedhttpresponse}
+\end{figure}
+
+On figure \ref{fig:malformedhttpresponse} it can be seen what the actual response looks like. This is caused by the constructed response being packed into another response by the underlying system. As a result, the responses would have to be packed out of the inner response before the body contents can be used.
+
+Both the problems with requests and response were caught late in development, and time did not allow for changes to be made in time.
+These things are considered as bad since they make the API counter intuitive to others, since they do not follow the standards.
+
+It could have been avoided had the standards for HTTP requests been researched better.
+
+\section{App}
+We chose to develop our app in Xamarin as described in section \ref{sec:targetplatform}. That caused some problems that is described in section \ref{sec:choiceofAppIDE}. Since only Android specific parts of the app is implemented, it would have simplified the development process by developing an Android app. It would help because Android documentation is fully up to date compared to Xamarin, and the problems described in section \ref{sec:choiceofAppIDE} could have been avoided.
+
+\subsection{Choice of App IDE}\label{sec:choiceofAppIDE}
+Xamarin seemed like a very reasonable IDE to use in the beginning of the project. This was mainly due to cross-platform development being easier when using Xamarin, since it allowed us to write platform independent code for some parts of the app. However the documentation for how to use Xamarin seemed to be severely out of date, or missing entirely. Some documentation was present online when it was missing from the in-editor documentation, but not everything. Furthermore, some of the documentation seemed out of date. When looking for platform specific code (Mainly Android), it also presented a problem in the fact that much of that code was written in Java, which does not translate directly into C\# and Xamarin.
+
+The second problem to present itself during the development process was error reporting. Often when encountering an error in the app (while it was running on a physical device) it would not report the specific error back, or maybe throw it from a completely unrelated place. When running code in a thread that was not the main thread and that thread encountered an error, the IDE would just kill the thread without reporting any errors back to the user making it hard to debug.
+
+The third problem was related to Xamarins UITest library. When we created the test project, we realized that it was not possible to contain the test project and the app projects within the same solution. This was due to the UITest library being built on an older version of the .Net libraries. We ended up having the tests in a separate solution, which we then supplied with the apk version of the app we wanted to test. This was not ideal, and again points to some parts of Xamarin being outdated at the moment.
+
+The fourth problem was related to performance. While it is expected that Xamarin needs time to compile, the time needed exceeded expectations. It is not believed to be setup issues, as it was tested on different hardware platforms both desktops and laptops.\\
+It took up to five minutes from start of compilation until deployment on the targeted phone, resulting in a lot of downtime.
+
+Furthermore, whenever a rebuild of the app was required (and in some cases specifically with Firebase Cloud Messaging), the project had to be cleaned which in turn crashed the IDE. This made for a long and tedious development process.
+
+In retrospective, the choice of Xamarin was not ideal since many of the problems that occurred with Xamarin could have been avoided if an Android only version of the app was made, and thereby the possibility to use Android studio. We also had no way of knowing that it would present this many problems.
+
+As an alternative to Xamarin, we could have used the respective platform specific IDE's (Android studio, XCode).
+
+\subsection{Firebase Cloud Messaging}
+As mentioned in section \ref{sec:fcm}, issues occurred with Google Cloud Messaging (GCM) and Firebase Cloud Messaging (FCM). Due to these troubles it was decided to use the library \textit{Firebase Push Notification Plugin}, described in section \ref{sec:fcm}. The library did however present its own problems for the development process. When compiling to a new device, the project had to be cleaned before a successful compile for the new device could be completed. This clean usually crashed the IDE, thus significantly increasing the development time.\\
+Instead of using the FCM library \cite{fcmplugin} FCM could have been configured manually. This might have avoided some of the issues, as it would have forced a greater understanding of how FCM works.\\
+A consequence of doing it manually could also increase development time.
+
+\section{Reflection of Development Method}
+This project used a plan-driven development process. The project started with an analysis of the problem area followed by design of the system based on the results. Afterwards the system was implemented and tested.
+
+During the implementation several problems were found in the initial design. This meant that the design had to be revised and adapt to the new needs. But as more problems occurred, design lacked behind, and the development turned towards ad-hoc. Because of this, some communication problems occurred between the different parts of the group, and time were spent working towards an outdated design.
+
+Since the project was made up of multiple parts, the group split up during the development into subgroups, each working on solving a sub-part of the problem. One part would work on the server while the other would work on the app, with a single man from the 
+app also working on the Control Panel. Since this split lasted for the entire project, the subgroups have become very knowledgeable about parts of the system, but have very limited knowledge about the rest of the system.
+
+With these problems being encountered during the semester, it could have been a better idea to follow a more iterative development approach. Doing this, the first design could be tested using prototypes and early implementations. This would also allow for testing different hosting solutions before making the decision and see if they have any limitations. The API can then also evolve with each iteration, so that the whole group knows it current state.
+
+Another thing that could be worth considering is rotating what people work on. This allows for everyone to have a hand in everything, and also encourages writing better documentation, comments, and commit messages as other members actually will depend on it.

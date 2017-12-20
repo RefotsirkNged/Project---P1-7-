@@ -1,50 +1,101 @@
-In this section, implementation of the control panel is described. The control panel is used to administrate users and devices.
-\todo{not enough}
+In this chapter, implementation of the control panel is described. The control panel is used to administrate users and devices. All figures of the control panel, contains numbers used to refer to specific parts of the figure, to simplify explanations about the individual elements.
+
+The control panel is written in HTML, CSS and javascript. The following libraries are used:
+\begin{itemize}
+    \item Javascript:
+        \begin{itemize}
+            \item Jquery\cite{controlPanel:Jquery}
+            \item JsTemplate\cite{controlPanel:JsTemplates}
+        \end{itemize}
+    \item CSS:
+        \begin{itemize}
+            \item Skeleton\cite{controlPanel:Skeleton}
+            \item Material icons\cite{controlPanel:MaterialIcons}
+            \item Pretty checkbox\cite{controlPanel:PrettyCheckbox}
+        \end{itemize}
+\end{itemize}
+
+In the control panel everything is loaded dynamically on the client side, so there is no refreshing or redirects to other pages. The data needed is obtained with the use of an ajax request sent to the server, and Javascript then updates the HTML to view the changes. Making the client handle all the computation in this fashion, and makes the control panel very scalable.
+All information communication with the server, is sent as JSON objects.
+
 
 \section{Login}
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.6]{Figures/ControlPanel/LoginView.png}
-    \caption{The view presented, when a user should login.}
+    \includegraphics[scale=0.4]{Figures/ControlPanel/LoginView.png}
+    \caption{The view presented, when a user wants to login.}
     \label{fig:controlPanelLoginView}
 \end{figure}
 
-When a user tries to first enter the control panel, they will be presented with a login page. A users email and password, are used for authentication. The data is sent via a POST request to the back-end. \todo{login url missing}. If the authentication is successful, the response is a tuple \todo{example data needed}. If the authentication failed, the response will be a tuple containing the status code 401 for unauthorized and -1 \todo{reason for -1}.
-Other than that, this page contains a register new user button. Currently, this button lets whoever uses it create a new user (Citizen or contact) \todo{nogen forklar det her bedre, i dont think this setup makes sense}
+When a user tries to enter the control panel, they are presented with a login page \ref{fig:controlPanelLoginView}. A users email and password, are used for authentication. The data is then sent via a POST request to the server. If the authentication is successful, the response is a JSON object containing the users information. An example of the received user data can be seen on figure \ref{lst:userLoginJSON}. If the authentication failed, the response will be a JSON object containing the status code 400 and id -1.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Javascript]
+    {
+        statusCode: "200",
+        body: {
+            address: "København Vej 42",
+            city: "København",
+            contacts: [
+                devices: [],
+                email: "annemadsen@gmail.com",
+                id: 1974,
+                name: "Anne Madsen",
+                role: "contact",
+                token: ""
+                ],
+            devices: [
+                id: 1,
+                token: "jk32n1jk3b21u3v2gh3tf21c32ub3k213n21kjn32hj",
+                devicetype: "alexa"
+            ],
+            email: "hannibal@gmail.com",
+            id: 1973,
+            name: "Mads Mikkelsen",
+            postnr: "9220",
+            role: "citizen", 
+            token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxOTczLCJ1c2VyX3JvbGUiOiJjaXRpemVuIn0.V3uJvt2lb4odiXvHLz4g-NbX_1ogrM1WkIeoubvLiHg"
+        },
+        headers: {
+            Content-Type: "application/json"
+        }
+    }
+    \end{lstlisting}
+    \caption{Example of a JSON object, received when a user successfully logs in.}
+    \label{lst:userLoginJSON}
+\end{figure}
+
+If a user wants to add a new user, they enter the register view by pressing button 1 seen on figure \ref{fig:controlPanelLoginView}. Further information about registering a new user, can be read in section \ref{sec:controlPanelRegistering}
+
+\section{Register}\label{sec:controlPanelRegistering}
+\begin{figure}[H]
+    \centering
+    \hfill
+    \subfigure[Citizen]{\includegraphics[scale=0.3]{Figures/ControlPanel/RegisterViewCitizen.png}}
+    \hfill
+    \subfigure[Contact]{\includegraphics[scale=0.3]{Figures/ControlPanel/RegisterViewContact.png}}
+    \hfill
+    \caption{The view to add a new user, of role citizen(borger) or contact(kontakt).}
+    \label{fig:controlPanelRegisterViewr}
+\end{figure}
+
+A users role can be either a citizen(borger) or a contact(kontakt). It is chosen by pressing on either button 1 or 2 seen on figure \ref{fig:controlPanelRegisterViewr}. When registering a new user, there are some difference depending on what role the new user has. For both citizen and contact, they need full name, email and password. If the user is a citizen, then the user also needs address, city and zip code.
+
+When all the information needed has been added, the user can create the new user by pressing on button 3. The user will get a notification telling if it was a success or not. If the creation was successful, the user will be redirected back to the login view \ref{fig:controlPanelLoginView} where they can now login using the newly added user. If it was not a success, the user will stay at its current view where the user can edit the information and try again.
 
 
 \section{Citizen admin}
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.4]{Figures/ControlPanel/CitizenAdminView.PNG}
+    \includegraphics[scale=0.3]{Figures/ControlPanel/CitizenAdminView.png}
     \caption{The view presented for a user, with citizen admin role.}
     \label{fig:controlPanelCitizenAdminView}
 \end{figure}
 
-The citizen admin view, is made of three boxes. Box 1 \textit{Tilføj ny borger} is used to add a new citizen, to the logged in citizen admins list of citizens.\\
-Box 2 \textit{Borger liste} contains every citizen that the logged in citizen admin, is administrating. When a new citizen is added from box 1, box 2 will be refreshed with the newly added citizen. The fields in box 2, are clickable and will fetch the information for the specific user and will be shown in box 3.
-
-Box 3 presents information for a specific citizen. The box will show the following information:
-\begin{itemize}
-    \item Full name
-    \item Email
-    \item Address
-    \item City
-    \item Postal code
-    \item A contact list
-\end{itemize}
-
-There is also a search field, where it is possible to search for a phone number that will return a contact if phone number is linked to a contact in our database. There is a button to add that new contact to the contact list. The contact also contains a button to remove a contact. 
-
-
-
-\section{Admin}
-%\begin{figure}[H]
- %   \centering
- %   \includegraphics[scale=0.5]{Figures/ControlPanel/AdminView.png}
- %   \caption{The view presented for a user, with admin role.}
- %   \label{fig:controlPanelAdminView}
-%\end{figure}
-\todo{ skal skrive om siden admin view ikke er der}
-
-%The admin view \ref{fig:controlPanelAdminView} is very simple. The %admin user is only used to add new users of roles citizen and %citizen-admin, therefor the view consist of a form that will send a %POST request containing the data to \todo{add new user url %missing}. \todo{response details}.
+The citizen admin view, is used to change information about users, specifically users of role citizen. The view can be seen on figure \ref{fig:controlPanelCitizenAdminView}. Box 1 consists of a scrollable list, containing all the citizens which the currently logged in citizen admin is administrator of.
+When clicking on one of the citizens in the list, the citizen information view (box 2) will appear. This view presents information about the selected citizen, where it can then be edited and the updated information sent to the server.\\
+The information presented is personal information about the user which can be seen in box 3.\\
+It is possible to add and remove devices and contacts from the citizen. The boxes 5 and 6 are used for device functionality. Box 5 is a scrollable list that presents the currently added devices. It is possible to remove a device from the list, by clicking on the cross that is on the right in every row. Box 6 is used to add devices, by giving a token and choosing between an Alexa or IFTTT device.\\
+Boxes 7, 8 and 9 is used to add and remove contacts. Box 7 is a search field, the user can use to search for contacts in the system by searching for their email. A contact already having a connection the citizen, will be ignored when searching for contacts. Box 8 presents the search results. Box 9 shows the already existing contact persons connected to the citizen currently being viewed. It is not possible to add a contact that is already connected to the citizen.\\
+When the changes has been made, the updates can be send to the server by clicking on button 4. The data is sent as a JSON object to the server using a POST request. The user will be notified if the update was a success or not.

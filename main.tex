@@ -13,7 +13,7 @@
 \input{Setup/Opsaetning/titlepages.tex}
 \input{Setup/Opsaetning/Forord.tex}
 %\input{Setup/Opsaetning/Resume.tex}
-
+\listoftodos
 \cleardoublepage
 \pdfbookmark[1]{Contents}{label:contents}
 \pagestyle{fancy} %enable headers and footers again
@@ -34,9 +34,10 @@
 
 \part{Preliminaries}
 \input{Sections/Chapters/Preliminaries/Preliminaries.tex}
-\part{Requirements \& Design}
+\part{Requirements \& Design}\label{chap:design}
 \input{Sections/Chapters/Design/Design.tex}
 \part{Implementation}
+\label{chap:implementation}
 \input{Sections/Chapters/Implementation/Implementation.tex}
 \part{Reflections}
 \input{Sections/Chapters/Reflection/Reflection.tex}

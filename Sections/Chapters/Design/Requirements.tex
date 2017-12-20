@@ -1,18 +1,36 @@
-In this chapter, the requirements of a system that can solve the problem described in the problem definition, in chapter \ref{problemdefinition} has been defined. This has been done by first exploring different use cases for the system and then analyzing them to get a formal list of requirements.
+In this chapter, the requirements of a system that can solve the problem described in the problem definition in chapter \ref{problemdefinition} has been defined. The goal is to produce a requirement specification.
 
-\section{System behaviour}
-\label{sec:system-behaviour}
-To better understand how the system, developed through out this report, could work, this section contains a description of actual situations, that we imagine the system could be used in. This includes descriptions of how each part of the system should respond to an event.
+First the roles of the different kinds of users that will use the system has been defined. The system behavior has then been defined for the part handling falling accidents. Finally the requirements are defined, using a MoSCoW analysis.
+
+\section{User Roles}\label{sec:user-roles}
+The system is designed around multiple types of users, each of which has their own role with different responsibilities. For this purpose, four user types has been defined: Citizen, Contact, Citizen Admin and User Admin. The responsibility of each has been described in the following sections.
+
+\subsection{Citizen}
+The citizen role represents the elderly people at risk of having a falling accident. They are the group that has been researched and described in chapter \ref{preliminaries:problemanalysis}. Their ability in the system should be to activate alarms when they have had a falling accident.
+
+\subsection{Contact}
+The contact role defines the group of people that can help citizens, who have had a falling accident. They do not have to be associated with a citizen.
+
+\subsection{Citizen Admin}
+The Citizen Admin is responsible for creating and managing the citizens in the system. They can manage multiple citizens, and can update their information and assign contacts. It was chosen to separate this functionality from the citizen, to minimize confusion and errors that might come from this. It is possible for a physical user of role citizen, to be a citizen admin as well, if the user has the technical skills to manage this.
+
+\subsection{User Admin}
+The User Admin role is for people who manage the system itself. They have access to view and manage all users, devices and alarms. They interact with the system through a web interface, such that the administrative part of the system does not have to work directly in the database in order to view or change things.
+
+\section{System behaviour}\label{sec:system-behaviour}
+To better understand how the system developed throughout this report could be designed, this section contains descriptions of actual situations that the system could be used in. This includes descriptions of how each part of the system should respond to an event.
 
 The system should be activated upon one of the following conditions, that triggers during or after the falling accident has happened:
 
 \begin{itemize}
-    \item The citizen activates the system manually
-    \item The smartphone detects a falling event
-    \item The personal assistant detects a falling event
+    \item A citizen activates the system manually
+    \item A smartphone detects a falling accident
+    \item A personal assistant detects a falling accident
 \end{itemize}
 
-When the smartphone detects a falling event, it should wait a short while for user response, either in the form of a button-press or voice-detection. This would allow for the user to interrupt the process, and therefore avoid emergency services or contact person being contacted when they are not needed. When a short while has passed, and no user interaction has happened, it should begin to contact people from that citizen contact list in the priorities order, this process can be seen on graph \ref{fig:SmartPhoneApp}.
+When a smartphone detects a falling accident it should wait a duration for user response, either in the form of a button press or voice detection. This would allow for the user to interrupt the process, and avoid contacts being contacted when not needed. When a duration has passed and no user interaction has happened, the system notifies all contacts associated with the citizen.
+
+A diagram showing this interaction can be found figure \ref{fig:SmartPhoneApp}. The figure shows the interaction between the citizen and contact, through the system. Dashed lines represent alternative paths. The timeout represents a system timeout, that activates the alarm, if no input is given by the user before it runs out. This syntax is used through out the rest of this chapter.
 
 \begin{figure}[H]
     \centering
@@ -21,7 +39,7 @@ When the smartphone detects a falling event, it should wait a short while for us
     \label{fig:SmartPhoneApp}
 \end{figure}
 
-When the personal assistant detects a falling accident it should verify that a falling accident has actually taken place, and then notify the system that the citizen has fallen and activate an alarm in the system. The personal assistant receives confirmation that help has been requested and who has responded to it. The personal assistant should be context aware, so that it doesn't call for help during normal dialogue, and in general try to distinguish between false positives. This process can be seen on graph \ref{fig:PersonAssitent}
+When a personal assistant detects a falling accident, it should verify whether or not a falling accident has actually taken place. If a falling accident has happened, the system should notify the contacts associated to the citizen that has had the accident. The personal assistant should be context aware, such that it does not call for help during normal dialogue, and in general try to distinguish between false positives. This process can be seen on graph \ref{fig:PersonAssitent}. Sequences in quotes represent speech.
 
 \begin{figure}[H]
     \centering
@@ -30,54 +48,48 @@ When the personal assistant detects a falling accident it should verify that a f
     \label{fig:PersonAssitent}
 \end{figure}
 
-When the system gets an alert of a falling event it looks up the citizen in need of help, and find their contact list. It then tries to contact people on the contact list until someone on the list responds to the call for help. There should also be an option to call emergency services, if nobody on the contact list responds, this can be seen in \ref{fig:SmartPhoneApp} and \ref{fig:PersonAssitent} in the interaction between the system and contacts.
 
-%A contact receives a notification when the contact is the next person on the contact list. 
+The system will notify contacts, through their chosen device. When using the app they should have the option of responding whether they can help or not, and in the case that they can help, the system should notify the citizen that help is on its way.
 
-Each contact person is contacted by the system the system in turn, until one of them accepts the request. If the contact does not answer, the system will leave a message letting the contact know that an event has occurred. If they do answer, they can let the system know if they are able to help or not, and if they say they are currently unable to help, the system will treat it as a failed attempt to contact.
+Apart from the above behaviours, the system should behave as follows when configuring new users and devices. The new user must be configured through a web interface. When a user is added, it is necessary to include enough information such that it is possible to identify the user. Each citizen has a list of contacts that the system will contact in case of a fall accident.
 
-Apart from the above behaviours, the system should behave as follows when configuring new users and devices. The new user must be configured through the web-interface. When they are added, it is necessary to include enough information such that it is possible for contacts to be identified. The list of contacts that the system will contact in case of a fall accident is created.
+A new fall detection device can be configured for the user. It is however not required that a user has a device. The app should however add itself as a device when the user login and remove itself again when the user logout.
 
-A new fall-detection device should be configured for the user, but it is not required that the user has a device.
-The new device can possibly be an app for a smartphone, a voice-assistant configured for fall-detection, or other IoT enabled devices. These devices are coupled with a specific user upon configuration.
+Devices can be either a smartphone, a voice-assistant configured for fall detection, or other IoT enabled devices. These devices are coupled to a specific user upon configuration.
 
-\subsection{Quantitative requirements}
-\label{sec:q-requirements}
-To be able to validate the system later, it is important to define some quantitative values that later can be measured and compared to validate whether or not the system lives up to the requirements. Two values that can be defined are the amount of false positives allowed and the amount of false negatives allowed.
+\subsection{Quantitative requirements}\label{sec:q-requirements}
+To be able to validate the system, it is necessary to define some quantitative values that can be measured and compared to validate whether the system lives up to the requirements. Two values that can be defined are the amount of false positives allowed and the amount of false negatives allowed.
 
 A false negative is when the system fails to register that a citizen has fallen.
  
-Two types of false positives can be considered. The first is when the system registers a fall accident, but the citizen has not fallen and cancels the system, before it sends out an alarm. The second is when the citizen does not manage to cancel the system, and an alarm is sent to the associated contacts.
+Two types of false positives can be considered. The first is when the system registers a fall accident, but the citizen has not fallen and cancels before an alarm is sent. The second is when the citizen is not aware that the system has registered a falling accident and therefore does not cancel it. An example could be that the devices detects a fall accident, but the device is in the citizens bag. The accident is not canceled and the citizens contacts are faulty notified.
 
-False negatives can have severe consequences for the user and must there for be avoided if at all possible. To perceive the system as a success it cannot have any false negatives, as long as the system is used as designed. To be able to adhere to this, the system might make more falls positives than if more false negatives were allowed. As a result it may have to send out an alarm when it might not be needed, for example in cases where no input is giving to the device after an acceleration.
+False negatives can have severe consequences for the user and must be avoided. To perceive the system as a success it cannot have any false negatives, as long as the system is used as designed. To be able to adhere to this, the system allows for more falls positives.
 
-As described in \ref{sec:lifeLine}, the solution \textit{Lifeline} \cite{AAlert}, claims that they have an accuracy of 95\%, meaning that 5\% of their alarms are false positive. Considering the non-tolerance for false negatives, this percentage is acceptable for our system, when measuring the first  type of false positives. If the system is used as intended, there should not be any false positives of the second type.
+As described in \ref{sec:lifeLine}, the solution \textit{Lifeline} \cite{AAlert} claims that they have an accuracy of 95\%, meaning that 5\% of their alarms are false positive. Considering the non-tolerance for false negatives, this percentage is acceptable for the system, when measuring the second type of false positives. If the system is used as intended, there should not be any false positives of the first type, since the citizen can cancel the alarm before it is activated.
 
+\section{MoSCoW analysis}\label{sec:moscow}
+From the system behaviour explored, throughout this chapter, and the quantitative requirements defined, a requirement specification has been formulated. The requirements define the functionality required for the system to be considered a success. To prioritize the requirements a MoSCoW analysis has been made.
 
-\section{MoSCoW analysis} \label{moscow}
-The functional requirements define the functionality of the system. To be able to prioritize the requirements, a MoSCoW analysis has been made, the result of which is found in this section.
-
-MoSCoW is a method for prioritizing requirements, where the requirements are organized into four categories: must have, should have, could have, and wont have.
-\textit{Must have} covers the requirements that are critical for the system to be considered a success. \textit{Should have} covers the requirements that are still important, but not critical for the system to be a success. \textit{Could have} covers the requirements that can improve the user experience, but are only added if time allows. \textit{Wont have} covers the requirements that are dropped or moved to a later release, but they may still be important for the system overall.
+MoSCoW is a method for prioritizing requirements, where the requirements are organized into four categories: \textit{must have}, \textit{should have}, \textit{could have} and \textit{won't have}.
+\textit{Must have} covers the requirements that are critical for the system to be considered a success. \textit{Should have} covers the requirements that are still important, but not critical for the system to be a success. \textit{Could have} covers the requirements that can improve the user experience, but are only added if time allows. \textit{Won't have} covers the requirements that are dropped or moved to a later release, but they may still be important for the system overall.
 
 \textbf{Must have}
-
 \begin{itemize}
     \item[1] Functionality to add and administrate citizens without need for a system administrator.
     \item[2] Detect when a citizen has had a fall accident, through input from the user on a device, such as a smartphone or wearable.
-    \item[3] Send an alarm to a prioritized list of contact persons, until someone reacts.
-    \item[4] Have a high accuracy when detecting a fall accident, as defined in section \ref{sec:q-requirements}.
+    \item[3] Send an alarm to all of the citizen's contacts.
 \end{itemize}
 
 \textbf{Should have}
-
 \begin{itemize}
-    \item[5] Detect when a citizen has had a fall accident, through conversation with a personal assistant.
+    \item[4] Detect when a citizen has had a fall accident, through conversation with a personal assistant.
+    \item[5] Facilitate communication between a citizen and contact person during a fall accident.
 \end{itemize}
 
 \textbf{Could have}
 \begin{itemize}
-    \item[6] Be able to integrate IoT devices and wearable tech such as actuators and sensors.
+    \item[6] Be able to integrate IoT devices.
         \begin{itemize}
             \item[6.1] Associate device with a citizen to send alarms using device.
             \item[6.2] Associate device with a contact person to receive alarms using device.
@@ -87,17 +99,12 @@ MoSCoW is a method for prioritizing requirements, where the requirements are org
 \textbf{Won't have}
 \begin{itemize}
     \item[7] Automatically detect when a citizen has had a fall accident, using a smartphone.
-    \item[8] Facilitate communication between a citizen and contact person during a fall accident.
+    \item[8] Have a high accuracy when detecting a fall accident, as defined in section \ref{sec:q-requirements}.
 \end{itemize}
 
 
-It was chosen to put requirement 5 under should have, because it is not a central part of the solution, but an add-on to show that more than just a smartphone can be used. 
+Requirements 4 and 5 has been defined as \textit{should have} since they are not considered core requirements for the system to be successful.
 
-We have chosen to put requirement 6 into could have, since it is a nice feature to have, but goes outside the current scope. If a solution to connecting the IoT device with a user could be made, it would be possible to connect other devices to the service.
+Requirement 6 has been defined as \textit{Could have}, since it is a \textit{nice to have} feature, but is outside the scope of this project.
 
-We have chosen to put requirement 7 under won't have because we do not have the time for the implementation. The automatic fall detection is the main goal of the system, but as simpler solutions can be made, we have chosen to put our priorities elsewhere.
-Requirement 8 is included in won't have because it will be very dependent on the technology that the citizen uses. If smartphones were the only technology, it would not be a problem as an automatic phone call could be made. But for other technologies, other solutions would be needed.
-
-
-
-With the requirements for the system defined, the next step is to design the system architecture and other parts of the system. This has been done in the chapter \ref{chap:system-arch}.
+Requirement 7 has been defined as \textit{Won't have}, since it is not the focus for this project. Requirement 8 is dependent of requirement 7, and therefore is also defined as \textit{Won't have}.

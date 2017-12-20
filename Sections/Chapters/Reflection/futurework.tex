@@ -1,0 +1,85 @@
+This chapter talks about different parts of the project and what we think will be the best future improvements to the different parts of the product or to improve the work process.
+
+\section{Developing Environment}
+In this section we will discuss some of the changes that has to be made to the development environment to make it easier/faster to develop in the future.
+
+\subsection{Building and Deploying}
+In the future, it would be beneficial to the project if a change was made to the building and deployment process. Currently a script combines all libraries into a folder for each lambda function together with the lambda handle for that function, before zipping it and uploading it to AWS. It is a time-consuming process even when making small changes, and commenting code to control what files to upload quickly become unmaintainable. 
+
+An alternative to this time-consuming process, would be to keep track of what files have changed since last time things were uploaded to AWS, and then only rebuild and upload those specific files.
+
+Another solution would be to pack the entire project in one .zip file, and upload it to S3. The individual AWS Lambda Functions can then all reference the same file, and just specify which file to call as their main file. This would make everything simpler as it only has to be built and uploaded once for everything. On the downside a lot more unnecessary data will need to be downloaded from S3 and loaded every time an AWS Lambda Function is run.
+
+\subsection{Debugging and Logging}
+Another issue that should be remedied in the future, is a problem with some of the logging.
+Late in development an additional AWS service called CloudWatch was included to aid debugging. This was done due to the fact that when calling the AWS Lambda functions from the API Gateway, direct logging is not available. Proper logging helped with identifying where things went wrong, and what caused it as it also logs all the relevant data.
+A problem with the log is that it prints every newline as a new log entry, quickly making it hard to read. It gets worse as more calls are made that fills up the log.
+So either better logging is needed, or some external system will be needed to make reading the log easier.
+
+\section{Server}
+
+In this section we will discuss the future changes and improvements that can be made to the server.
+
+\subsection{Alarm Management}
+
+It is currently possible to create and update alarms, but there is no way to remove an alarm, or verify that someone have responded should they not use the app. 
+To fix that, the citizens should have a way to disable their alarm after they have received help. While a contact can say that they can help, it doesn't mean that they arrive to help instantly, so the alarm would still be active.
+An automatic solution would be to try and notify the citizen, to verify if the alarm is still active, and in the case that it is, either resend notifications, sms messages, or try calling.
+
+
+\subsection{Error Handling}
+
+When an exception is thrown, or some data is just wrong or missing, an error is returned. But the error is currently always 400, and the current design does not offer any consistent way to send additional error information. This results in the returned model being of no value should an error occur, so the the Control Panel/App would have no idea what happened, or what to display to the user.
+
+\begin{figure}[h]
+    \centering
+    \begin{lstlisting}[language=Javascript]
+    {
+        "error": true,
+        "citizen": null,
+        "errormessage": "Invalid email or password!"
+    }
+    \end{lstlisting}
+    \caption{A proposal so message bodies containing error messages}
+    \label{fig:response_with_error}
+\end{figure}
+
+Figure \ref{fig:response_with_error} shows one way to return more meaningful errors, where the returned model is packed into JSON together with an error field, that uses a bool to state if there is an error. In the case of an error, it would then always have an error message with what went wrong. Otherwise it could then use the field with the name of the model that the server would have returned.
+Status codes could also be clearer, as the server always returns 200 or 400 unless the error happens outside the reach of the server. By categorizing error checks and exceptions better, more accurate status codes could be returned.
+
+\section{App}
+During future development on the app, some specific things should be improved.
+
+The current notification system provides the relevant information for the recipient, regarding who has had an accident, positional information etc. It does not offer any way to cancel an alarm after someone has confirmed that they can help.
+Furthermore, when sending out notifications, the app should also be able to send sms's when offline.
+
+The fall detection service should be fully implemented.
+It should conserve energy well enough that it does not impact battery life too much, and be able to detect all fall incidents. \label{app:falldetectionservice}
+
+Parts of the control panel (For creating new users and adding devices) could also be integrated into the app, to make it more accessible.
+
+\section{Control panel}\label{sec:discussion:controlPanel}
+During future development on the control panel, some features and tests needs to be implemented.
+
+The control panel has not gone through a usability test. As such we are not aware if the design of the interface, is easy to use to the average user.
+
+Currently when a user logs in, the list of citizens returned from the server is not citizens administrated by the specific user, but all citizens existing in the database. That is because the functionality to fetch specific citizens is not yet implemented on the server-side.
+
+Currently anyone who knows the URL of the interface, can create new users and login as those users. This presents a problem, due to the fact that every user is returned to whoever logs in to the instead of only the specific ones the user administrates. This presents a problem with privacy, as there is very strict rules for what a given user is allowed to see/edit about other citizens.
+
+Currently it is not possible to update a users information on the server. The changes can be made in the control panel, but the request to the server fails. The reason for the error is currently unknown, and no useful errors are given in the logs. As such it is an error that would have to be fixed, if implementation continued after project completion.
+
+\section{Usability test}
+\label{sec:usability-test}
+
+In the future, usability tests should be performed on all parts of the system. This is important especially since our target audience is older people as defined in chapter \ref{preliminaries:problemanalysis}. They are often not acquainted with technology, and such usability will improve the quality of the app and control panel. Further more, it is hard to conclude on the success of the project, without testing if it actually has any positive effect for the users.
+
+\subsection{App}
+Because the app is one of the tools used when a falling accident has happened, it is critical to test every part that the user is interacting with, so they will have to be able to do the test from the up start of the app.\\
+Example cases that could be used to test the UI traversal and usability, can be found in appendix \ref{bi:appTest}.
+
+Exhaustive testing of these test cases would present much more conclusive data on whether or not the app is usable, than what has been done during this project.
+
+\subsection{Control Panel}
+Contrary to the app, the control panel is not used in emergencies so usability quality is not as critical important but it still has to be usable. The control panel as described in section \ref{sec:user-roles} can possibly be used by a wide age range of people, from elder to their children or public service workers. This means that there is a large target group, that the interface must be tested on, to make sure that the interface is easily usable to all intended users.\\
+Example cases that could be used to test the functionality and usability, can be found in appendix \ref{bi:controlPanelTest}:

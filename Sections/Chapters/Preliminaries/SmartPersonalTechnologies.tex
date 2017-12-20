@@ -1,88 +1,37 @@
 \label{chap:technologies}
-In this chapter we will look as smart technologies that can be used for fall detection. In chapter \ref{preliminaries:existingsolutions} we looked at existing solutions that made use of specialized devices. In this chapter our focus will be on more general technologies that may be to find in a normal home, looking at what they are, and how they could be used in our project.
+In this chapter different smart technologies that can be used for fall detection are examined. In chapter \ref{preliminaries:existingsolutions} an analysis of existing solutions that makes use of specialized devices was presented.
 
-%\section{Smart}
-%In this section we will look at the term smart, and what it means.
-
-\section*{Smartphone} \label{technologies:smartphone}
-The smartphone is a phone with a multi-touch enabled screen, storage capabilities, accelerometer, GPS, and internet access. The smartphones typically comes with Android or iOS as the installed operating system. Some smartphones are even designed with elderly people as their target group such as those made by Doro \cite{doro}. Most people also carry their smartphone with them most of the time.
-Smartphones becomes smart because they are not limited to what they come with, but can be extended with Apps from third party sources. With apps a smartphone is limited only by its hardware capabilities.
-
-We can use a smartphone as a general device for detecting and handling falling accidents. The smartphone has an accelerometer that can always be listening for a fall. When the accelerometer detects the fall it can contact a server, and send information including the position of the citizen. With a microphone it is also possible for the smartphone to listen for activity if it thinks someone has fallen, or establish a call with someone, so that the citizen will feel more safe being in contact with another human being.
-
-\section*{Smartwatch}
-A smartwatch is a wearable device that a person can have around their wrist like a watch. Simple smartwatches can tell the time in many different time-zones, use GPS to track a person while exercising, or monitor the pulse.
-In recent years smartwatches have moved to also be a full accessory for smartphones. The smartwatches can show messages, work as microphone for a call, and even have apps running on them.
-
-We can use smartwatches as they also are likely to have accelerometer and GPS built in, that can be used for detection and alerting. And since the smartwatch is on the citizens wrist, it may also be more reachable for them if necessary, as a smartphone is likely to be in a pocket that can be hard to reach in some circumstances.
-
-\section*{Smart Home}
-The home is becoming smarter as more things are connected to the internet. This is often known as the Internet of Things. Light bulbs, refrigerators, coffee machines are all devices that can now be connected to the internet either directly, or through a hub. The devices can then be interacted with through the use of fx. a smartphone.
-
-With everything being on the internet, it will also be easier to monitor the everyday life of a citizen, and look for abnormal or no activity. This may be used as an indication that something has happened.
-
-\section*{Personal Intelligent Assistants}
-Personal intelligent assistant is a term for an intelligent system that is able to understand and interpret meaning in a sentence or text, and follow the command. It can be something as simple as setting an alarm, or search for information on the internet and then give a quick summery by fx. reading out loud the first few lines. Most new smartphones comes with a personal assistant already installed, while other assistants come on their own devices. Many of the assistants can also be expanded upon by installing new skills the same way apps can be installed on a smartphone.
-
-We can use a personal assistant as a different way of detecting a falling accident as the personal assistant has no direct means of detecting it. Instead it can listen for a call for help, and then notify others that something has happened.
-
-\section*{Limiting the Scope}
-There are many different devices that can be used in the home to monitor the problem, and in this section we will try and limit ourselves to a few of these technologies to continue working with.
-
-Smartphones offer many possibilities, and are already owned by a lot of people, and with models even targeted at elderly people, so we choose to continue working with them.
-
-Smartwatches are just a supplement to smartphones, so we delimit ourselves from working any more with smartwatches.
-
-Smart home devices have a lot of future potential for detection, but since many of the existing ones doesn't fit our needs, we delimit ourselves from working more with then. But we will still leave room for them in the future if needed.
-
-We also choose to continue working with personal intelligent assistants as they are different from the others, with a different interface for the user to interact with. Since some personal intelligent assistants operate from a device separate from the smartphone they may also work when the citizen doesn't carry their smartphone.
-
-So with that we continue work with smartphone and personal intelligent assistant, but have the smart home in the back of our head.
-
-\iffalse
-In this chapter we will look at smart personal technologies that can be used for assist citizens that has had a fall accident. In existing solutions \ref{sec:existing_solutions} we have seen a few possibilities, where a necklace or sensor can be used to monitor the citizen and raise alarm, but there are many more possibilities. Some of these has been investigated in this chapter.
+In this chapter the focus is on general technologies that may be found in an ordinary home, looking at what they are, and how they could be integrated in this project.
 
 
-\section*{Smart}
-The term \textit{smart} is, in this report, used to describe devices that are connected to other devices with the help of wireless protocols. Smart devices can, often, connect to the World Wide Web, opening up for new systems such as smart homes, smart phones, smart fridges etc. \todo{Tilføj IoT}
-%https://www.techopedia.com/definition/31463/smart-device
+\section{Smartphone} \label{technologies:smartphone}
+\textit{Oxford dictionary} defines a smartphone as:
+\begin{figure}[H]
+    \begin{center}
+        \textit{A mobile phone that performs many of the functions of a computer, typically having a touchscreen interface, Internet access, and an operating system capable of running downloaded apps.} \cite{oxford:smartphone}
+    \end{center}
+\end{figure}
+Some smartphones are designed with elderly people as their target group such as those made by Doro \cite{doro}. Most people also carry their smartphone with them most of the time \cite{smartphonecarry}.
 
-\section*{Smart home}
-A smart home is the concept for connecting smart devices, to a central unit designed to automate mundane tasks in a household. The central unit receives and/or sends information to the connected machines where, dependent on the machine, it can run some predefined automated task or collect information. The type of different usable devices ranges greatly. Examples could be temperature control, surveillance or door locks etc.
+The system could use a smartphone as a general device for detecting and handling fall accidents. Most modern smartphones usually has an accelerometer that could be used for ongoing fall detection. When the accelerometer detects a fall, it could then contact a server, and send information including the position of the citizen. With a microphone it could be possible for the smartphone to listen for activity such as someone yelling while falling. It could also establish a call with someone, such that the fallen citizen will feel more safe being in direct contact with another human being.
 
+\section{Smart Home}
+The home is becoming smarter as more things are connected to the internet. This development is often known as the Internet of Things. Light bulbs, refrigerators, coffee machines are all devices that can now be connected to the internet either directly, or through a hub. The devices can then usually be interacted with through the use of a smartphone.
 
-\section*{Smartphone}
-A smartphone, is a mobile phone that, can connect to many kinds of networks such as the World Wide Web, other devices with bluetooth, WiFi etc. Smart phones contain a lot of different sensors, to get information from its surroundings. Since it is a phone, it can naturally do everything that a normal phone can. 
+With everything being connected to the internet, an option could be to monitor a citizen, and look for abnormal or no activity. This could also be used as an indication that something has happened.
 
+\section{Personal Assistants}
+We define a personal assistant as an intelligent system that is able to understand and interpret meaning in a sentence or text, and follow the command. This is usually done using text or voice commands. It can be something as simple as setting an alarm, or performing a search for information on the internet and then give a quick summary by reading out loud. Most new smartphones come with a personal assistant already installed, while other assistants come on their own devices. Many of the assistants can also be expanded upon by installing new skills the same way apps can be installed on a smartphone.
 
-\section*{Internet of Things}
-Internet of Things or \textit{IoT} is the concept of making dumb "things" smarter, by making them capable of connecting to networks. The reasons it is called "Things" and not devices or machines, is because IoT is about making everything that we can think off smarter. For example making a bike smarter by collecting information on how far a person has ridden a day, and then allowing the information to be viewed on some other device.
+The system could use a personal assistant as a different way of detecting a falling accident as the personal assistant has no direct means of detecting it. Instead it can listen for a call for help, and then notify others that something has happened.
 
-The concept is also used in smart homes, but smart homes focuses on making the home smarter, whereas IoT is the concept of making all things smarter.
+\section{Conclusion}
+There are many different devices that could be used in the home to monitor accidents. This section limits which of the technologies is discussed and used further on in the project.
 
-%\section{Smartphone}
-%An increasing amount of the population has a smartphone. 
-%Vi vil har at i skal ende ud paa at mange har smartphones saa en statestik fra danmarks statestik ville vaere godt, hvordan smartphone har en masse teck inbygget som kan bruges til at tjekke om du er faldet og kontakte andre mennesker for at faa hjelp, og noget om hvor meget folk har deres smartphone paa dem
+Smartphones offer many possibilities, and with some models even being targeted at elderly people \cite{doro}, we choose to continue working with this technology.
 
-\section*{Wearables}
-Watches and smart watches are becoming more advanced and intelligent, offering more options for interaction, gps and more. Smart watches goes even further, as they are often connected to a smart phone. This allows easier access to a smartphone, even if the phone is in a pocket that can be hard to reach.
+Smart home devices has a lot of future potential for detection, this technology will be further explored in later parts of the project.
 
-\section*{Smart Sensors}
-Many of the technologies used in existing solutions \ref{sec:existing_solutions} makes use of smart sensors. Small sensors can be used to monitor if the citizen has fallen, or if they have remained 
+Some personal assistants can also operate on a device separate from the smartphone, and can still be used when the citizen doesn't carry a smartphone.
 
-
-\section*{Personal Assistant}
-Many modern smartphones now come with a personal assistant, and more are coming outside the smartphone market. The most personal assistants rely on voice recognition to be able to do everything from looking up info on the internet to managing your smart devices, turning off the light or starting the coffee machine, should the devices be connected to the IoT. Personal assistants can also be used to communicate by asking it to send a message or make a call. They can also be asked to make an emergency call. But when they do so, they usually give a small time frame to cancel the call before it happens in case the call was an accident.
-
-\section{Limiting Scope}
-We have needed to limit our self in the scope of this project, as we could not work with everything.
-
-Smartphones have many of the same features that can be found in smart sensors. This includes camera, microphone, GPS, internet connection, and more. While all citizens have not had a smartphone, and it would not be the ideal solution for many, it would offer a great platform for prototyping.
-Since wearables and smart sensors can do many of the same things as smartphones, we won't focus more on them in the report.
-
-Personal assistants offer the possibility of using voice, to call for help when a citizen has a fall accident. Using ones voice is also more intuitive and very easy to use, compared to learning to use a smartphone. There are devices designed to be used with voice only, but is not enough to be used as a stand alone device for our use case.
-
-Devices that are part of smart home could be used for more advances detection, or help citizens with problems beyond fall detections. We will however not work with smart home since it goes beyond our focus of the project, but we will still consider them when developing the solution.
-
-We will focus on smartphones and personal assistants as the main interface options, but make the system as open-ended as possible so other smart devices can be integrated in the future.
-\fi
+In the following chapter \ref{problemdefinition}, a problem definition is written, using the limits set by the problem analysis as a whole.

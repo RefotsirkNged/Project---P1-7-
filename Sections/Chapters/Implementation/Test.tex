@@ -1,62 +1,103 @@
-\section{API test} \todo{august is writing this}
-This section describes the different kinds of tests we performed to ensure that the basic functionality of our API was working properly. The tests has been split into three parts, alarm, device and user. Together these covers the API endpoints\todo{Hedder det endpoints?}.
+In this chapter, the different tests that has been performed on the system is described and presented along with the results. To ensure that the all parts of the system functions as expected, tests has been performed on each part of the system.
 
-The tests are written in Python, using the \textit{unittest} library that is bundled with the language \cite{unittest}. The framework is inspired by JUnit and other similar frameworks for writing and running unit test.
+Different testing strategies has been used for the different pars of the system. The API has been tested by writing unit-test cases for the different endpoints, which asserts if the response from the service corresponds to what is expected, this is described further in section \ref{sec:api-test}. The test strategy used for the App is implemented similarly to the API test, using unit-tests, with the difference that these test the different GUI elements of the app, and not API calls. These tests are described in section \ref{sec:appTest}. Lastly, the integration of the different components has been tested through black-box tests. These are, formulated and documented in section \ref{sec:integration-test}.
 
-\subsection{Alarm test}
-For the Alarm, the \textit{GET, POST} and \textit{DELETE} has been tested. The setup for this test adds a citizen to the system and the tear down makes sure to delete it again. The test itself is found on figure \ref{fig:test-alarm}.
+\section{API test}
+\label{sec:api-test}
+This section describes the different kinds of tests performed to ensure that the basic functionality of the API was working properly. They were run each time a change were made to the web service, to ensure that it was still working according to the documentation. The tests has been split into three parts, alarm, device and user. Together these covers the API endpoints. Table \ref{tab:api-tests} shows the different test cases along with their status at the end of the project period.
 
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Test}          & \textbf{Input}                & \textbf{Expected output}                      & \textbf{Status}                        \\ \hline
+alarm.POST    & User id, through URL & Corresponding alarm                  & {\color[HTML]{009901} Passed} \\ \hline
+alarm.GET     & User id, through URL & Corresponding alarm                  & {\color[HTML]{009901} Passed} \\ \hline
+alarm.DELETE  & User id, through URL & Empty alarm with ID -1               & {\color[HTML]{009901} Passed} \\ \hline
+device.POST   & Device               & Corresponding device with updated ID & {\color[HTML]{009901} Passed} \\ \hline
+device.DELETE & Device               & Empty device with ID -1              & {\color[HTML]{009901} Passed} \\ \hline
+citizen.GET   & User id, through URL & Corresponding Citizen                & {\color[HTML]{009901} Passed} \\ \hline
+contact.GET   & User id, through URL & Corresponding Contact                & {\color[HTML]{009901} Passed} \\ \hline
+user.POST     & User                 & User with updated ID                 & {\color[HTML]{009901} Passed} \\ \hline
+user.GET      & Username, email      & Corresponding user                   & {\color[HTML]{009901} Passed} \\ \hline
+user.DELETE   & User                 & Empty user with ID -1                & {\color[HTML]{009901} Passed} \\ \hline
+\end{tabular}
+\caption{API test cases}
+\label{tab:api-tests}
+\end{table}
+
+
+The tests are written in Python, using the \textit{unittest} library that is bundled with the language \cite{unittest}. The framework is inspired by JUnit and other similar frameworks for writing and running unit tests. 
+
+Each test case follows a basic structure, an example of this structure, can be seen on figure \ref{fig:test-api-example}
 
 \begin{figure}[H]
     \centering
-    \begin{python}
-def test_alarm_post_get_delete(self):
-        self._alarm = Alarm(0, self._citizen, None)
-        alarm_post_header = {"alarm": self._alarm.serialize().replace("\"", "\\\""), "token": "TOKEN"}
+    \begin{lstlisting}[language=pyt]
+def test_get_citizen(self):
+    user_get_header = {'token': self._citizen.token}
+    user_get_uri = "https://.../citizen/" + str(self._citizen.id)
 
-        alarm_uri = "https://.../citizen/" + str(self._citizen.id) + "/alarm"
+    _citizen_response = user.deserialize(get_response(requests.get(user_get_uri, headers=user_get_header)))
 
-        self._alarm = alarm.deserialize(
-            get_response(requests.post(alarm_uri, headers=alarm_post_header)))
-        self._alarm_response = alarm.deserialize(
-            get_response(requests.get(alarm_uri,  headers=alarm_post_header)))
+    self._citizen.token = ""
+    _citizen_response.token = ""
 
-        alarm_delete_header = {"alarm": self._alarm.serialize().replace("\"", "\\\""), "token": "TOKEN"}
-        alarm_uri = "https://.../citizen/" + str(self._citizen.id) + "/alarm"
-
-        _alarm_delete = alarm.deserialize(
-            get_response(
-                requests.delete(alarm_uri, headers=alarm_delete_header)))
-
-        self.assertDictEqual(
-            json.loads(self._alarm.serialize().replace("'", "\"")
-                .replace("None", "null")), 
-            json.loads(self._alarm_response.serialize()
-                .replace("'", "\"").replace("None", "null"))
-        )
-            
-        self.assertEqual(-1, _alarm_delete.status)
-        \end{python}
-    \caption{Example of login}
-    \label{fig:test-alarm}
+    self.assertDictEqual(json.loads(self._citizen.serialize().replace("'", "\"")), json.loads(_citizen_response.serialize().replace("'", "\"")))
+        \end{lstlisting}
+    \caption{Example test case}
+    \label{fig:test-api-example}
 \end{figure}
 
-First a new alarm is posted to the system from the user created during setup, this alarm is then gotten through a get request, both of these are then saved as variables and the alarm is then deleted. The test now asserts if the parameters of the posted and gotten alarm are equal. Lastly it is asserted if the alarm returned from the delete request has a status of -1, which indicates that the 
+The example asserts if a posted citizen (added to the service during the setup of the test), is equals to the citizen that is returned from a \textit{GET} request.
+
+
+\subsection{Alarm test}
+For the Alarm, the \textit{GET, POST} and \textit{DELETE} has been tested. The setup for this test adds a citizen to the system and the tear down makes sure to delete it again.
+
+The first thing that happens is that a new alarm is posted to the system from the user created during setup. This alarm is then returned through a \textit{GET} request. Both of these alarms are saved as variables in the test, and the alarm is then deleted. The test then asserts if the parameters of the posted and retrieved alarm are equal. Lastly it is asserts if the alarm returned from the delete request has a status of -1, which indicates that the delete was successful.
 
 \subsection{Device test}
+During the setup of the Device test, a Citizen is created to be used during the test, and removed again in the tear down. There are two tests in the Device test case. The first tests if a device can be successfully posted to the system and the second tests if a device can be successfully deleted.
 
+The first test asserts if a device is posted correctly to the system. The tests first posts a device to the system, saving the result in a variable. Next it gets the user that the device was posted to and asserts if the users first (and only) device is equals to the device that was posted.
+
+The first thing that happens in the second test, is that a device is added to the user created during setup. The device is then deleted and an assert is made to evaluate if the user now has no devices.
 
 \subsection{User test}
+The user part of the tests has been split into two categories, where the tests in each are identical, except for the type of user they test. The first category tests if the system returns the correct citizen or contact on a get request on a specific citizen- or contact \textit{id}.
 
+The setup of this test creates either a contact or citizen, depending on which is being tested. The test then sends a \textit{GET} request to the server and asserts if the returned user corresponds to the one posted during setup.
 
+The second category of tests focuses on calls through the \textit{user} endpoint. Here \textit{POST, GET} and \textit{DELETE} are tested for each user type. The test case tests all the mentioned API calls, by first posting a user of the given type, then getting it and asserting the two, then it deletes it and assert at the delete were successful. This is done for all the user types, \textit{Citizen}, \textit{Contact}, \textit{Citizen Admin} and \textit{User Admin}.
 
 \section{App test}
-In order to test some of the basic functionality and UI of the app, we use Xamarin.UITest. Using UITest means that while testing we do not know what data the app contains, but only what is on the UI. This is then usefull to determine that the right UI-elements appear in the right places, and that the functionality behind works as intended. We use this method to test mainly because it lets us test both the UI and the functionality at the same time. This saves development time, and if in the future we should decide on further development, it will be useful to have this kind of test already implemented.
-Another benefit is that with this kind of test implemented, we can implement automated UI tests in the future using Xamarin Test Cloud. Xamarin Test Cloud tests the app across multiple devices at once, in order to ensure that the app works on many different hardware platforms. 
+\label{sec:appTest}
+In order to test some of the basic functionality and UI of the app, the Xamarin.UITest framework were used. Using UITest means that while testing it is not known what data the app contains, but only what is on the UI. This is useful to determine that the right UI-elements appear in the right places on the screen, and that the functionality of the app works as intended. This method is used to test, since this makes it possible test both the UI and the functionality at once. This saves development time, and makes it possible to more easily test new code.
+
+Another benefit is that with this kind of test, it is possible to implement automated UI tests in the future using Xamarin Test Cloud. Xamarin Test Cloud tests the app across multiple devices at once, in order to ensure that the app works on many different hardware platforms. 
+
+\begin{table}[h]
+\centering
+
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Test}     & \textbf{Expected result} & \textbf{Status}               \\ \hline
+AppLaunches       & User name field exists   & {\color[HTML]{009901} Passed} \\ \hline
+LogInContactUser  & Hidden button exist      & {\color[HTML]{009901} Passed} \\ \hline
+LogInCitizenUser  & Help button exist        & {\color[HTML]{009901} Passed} \\ \hline
+CallForHelpCancel & Help button exist        & {\color[HTML]{009901} Passed} \\ \hline
+CallForHelp       & Help button exist        & {\color[HTML]{009901} Passed} \\ \hline
+\end{tabular}
+\caption{App test cases}
+\label{tab:app-test}
+\end{table}
+
+Table \ref{tab:app-test} shows the different tests that has been performed on the App, along with their status and expected results.
 
 \begin{figure}[H]
     \centering
-    \begin{lstlisting}
+    \begin{lstlisting}[language=cs]
         private void LogInCitizenUser()
         {
             app.EnterText(c => c.Marked("UserName"), "a");
@@ -68,33 +109,64 @@ Another benefit is that with this kind of test implemented, we can implement aut
     \label{fig:test:loginFunction}
 \end{figure}
 
-Figure \ref{fig:test:loginFunction} is an example of logging in in the app inside the testing framework in order since we need to log in in every test case. Elements are found by their ID's, which is manually specified in the corresponding view, then you can specify a action like enter text or tap.
+Figure \ref{fig:test:loginFunction} is an example of logging into the app inside the testing framework. Elements are found by their ID's, which is manually specified in the corresponding view. When you have an elements id, it is possible to perform actions on that element, like typing in text or tapping.
 
 \begin{figure}[H]
     \centering
     \begin{lstlisting}
-        [Test]
-         public void CallForHelpCancel()
-         {
-             LogInCitizenUser();
+[Test]
+public void CallForHelpCancel()
+{
+    LogInCitizenUser();
  
-             AppResult[] helpButton = app.WaitForElement(c => c.Marked("helpButton"), "Did not see the success message.",
-                 new TimeSpan(0, 0, 0, 90, 0));
+    AppResult[] helpButton = app.WaitForElement(c => c.Marked("helpButton"), "Did not see the success message.", new TimeSpan(0, 0, 0, 90, 0));
  
-             app.Tap(c => c.Marked("helpButton"));
+    app.Tap(c => c.Marked("helpButton"));
  
-             AppResult[] respons = app.WaitForElement(c => c.Marked("NoHelp"), "Did not see the success message.",
-                 new TimeSpan(0, 0, 0, 90, 0));
+    AppResult[] response = app.WaitForElement(c => c.Marked("NoHelp"), "Did not see the success message.",
+    new TimeSpan(0, 0, 0, 90, 0));
  
-             app.Tap(c => c.Marked("NoHelp"));
+    app.Tap(c => c.Marked("NoHelp"));
  
-             AppResult[] resualt = app.WaitForElement(c => c.Marked("helpButton"), "Did not see the success message.",
-                 new TimeSpan(0, 0, 0, 90, 0));
+    AppResult[] result = app.WaitForElement(c => c.Marked("helpButton"), "Did not see the success message.",
+    new TimeSpan(0, 0, 0, 90, 0));
  
-             Assert.IsTrue(resualt.Length == 1);
-         }
+    Assert.IsTrue(result.Length == 1);
+}
     \end{lstlisting}
     \caption{Code for cancel call for help}
     \label{fig:test:cancelHelp}
 \end{figure}
-In the example \ref{fig:test:cancelHelp} the code used to test if we are able to cancel an event is shown. This code tests two things, whether or not the right UI elements show up at the right time, and whether or not the functionality actually lets us cancel an event.
+
+The code example on figure \ref{fig:test:cancelHelp}, shows a test case for testing whether or not pressing the cancel button actually cancels the event. To do this, two things are tested; whether or not the right UI elements show up at the right time, and whether or not the functionality actually lets us cancel an event.
+
+
+\newpage
+\section{Integration test}
+\label{sec:integration-test}
+The integration test for the different parts of the system, has been made by manually running though some predefined tests. This has been done to minimize faults in the system and to validate that the system fulfills the requirements as defined in section \ref{sec:moscow}.
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Test}                                                                                               & \textbf{Expected result}                                                                                                 & \textbf{Status}                        \\ \hline
+A citizen has logged into the app                                                                  & An app device has been added to the citizen                                                                     & {\color[HTML]{009901} Passed} \\ \hline
+A contact has logged into the app                                                                  & An app device has been added to the contact                                                                     & {\color[HTML]{009901} Passed} \\ \hline
+Alarm is activated from app                                                                        & \begin{tabular}[c]{@{}l@{}}An alarm is activated in the system,\\ all contact persons are notified\end{tabular} & {\color[HTML]{009901} Passed} \\ \hline
+Alarm is canceled from app                                                                         & Nothing is added to the system                                                                                  & {\color[HTML]{009901} Passed} \\ \hline
+Alarm is activated from Alexa                                                                      & \begin{tabular}[c]{@{}l@{}}An alarm is activated in the system,\\ all contact persons are notified\end{tabular} & {\color[HTML]{009901} Passed} \\ \hline
+Alarm is canceled from Alexa                                                                       & Nothing is added to the system                                                                                  & {\color[HTML]{009901} Passed} \\ \hline
+Alarm is received in app and accepted                                                              & \begin{tabular}[c]{@{}l@{}}Responder is added to alarm in system,\\ the citizen is notified\end{tabular}        & {\color[HTML]{009901} Passed} \\ \hline
+Alarm is received in app and declined                                                               & Nothing is changed                                                                                              & {\color[HTML]{009901} Passed} \\ \hline
+\begin{tabular}[c]{@{}l@{}}A new citizen is signed up from,\\  the control panel\end{tabular}      & A citizen user is added to the system                                                                           & {\color[HTML]{009901} Passed} \\ \hline
+\begin{tabular}[c]{@{}l@{}}A new contact is signed up from,\\  the control panel\end{tabular}      & A contact user is added to the system                                                                           & {\color[HTML]{009901} Passed} \\ \hline
+\begin{tabular}[c]{@{}l@{}}A device is added to a citizen,\\  from the control panel\end{tabular}  & A device is added to the user in the system                                                                     & {\color[HTML]{CB0000} Failed} \\ \hline
+\begin{tabular}[c]{@{}l@{}}A contact is added to a citizen,\\  from the control panel\end{tabular} & A device is added to the user in the system                                                                     & {\color[HTML]{CB0000} Failed} \\ \hline
+\end{tabular}
+\caption{Integration test cases}
+\label{tab:integration-test}
+\end{table}
+
+On table \ref{tab:integration-test}, the different integration test cases are shown, with their expected result and current status. The tests has been executed, by manually doing the steps required to do each test in the corresponding system component. The bottom two tests in \ref{tab:integration-test} are marked as failed, due to an unknown error in the the system.
